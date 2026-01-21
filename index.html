@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptLab - Escritura con IA</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { 
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+        body {
+            background: linear-gradient(to bottom right, #FFF5EE, #F5F5F5);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        .btn-primary {
+            background-color: #FF7A00;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+        .btn-primary:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background-color: #E8E9E9;
+            color: #4A4A4A;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.3s;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E8E9E9;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #FF7A00;
+        }
+        .textarea-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E8E9E9;
+            border-radius: 8px;
+            font-size: 14px;
+            min-height: 96px;
+            resize: vertical;
+        }
+        .textarea-field:focus {
+            outline: none;
+            border-color: #FF7A00;
+        }
+        .label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .helper-text {
+            font-size: 12px;
+            color: #8A8B8C;
+            margin-top: 4px;
+        }
+        .content-type-btn {
+            padding: 12px;
+            border: 2px solid #E8E9E9;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .content-type-btn.active {
+            border-color: #FF7A00;
+            background-color: #FFF5EE;
+        }
+        .step-indicator {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .step-label {
+            font-size: 12px;
+            margin-top: 4px;
+            text-align: center;
+            color: #8A8B8C;
+        }
+        .step-label.active {
+            font-weight: 600;
+            color: #FF7A00;
+        }
+        .progress-line {
+            flex: 1;
+            height: 4px;
+            margin: 0 8px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+        .space-y-4 > * + * {
+            margin-top: 16px;
+        }
+        .space-y-6 > * + * {
+            margin-top: 24px;
+        }
+        .alert {
+            padding: 16px;
+            border-left: 4px solid;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .alert-info {
+            background-color: #EFF6FF;
+            border-color: #3B82F6;
+            color: #1E3A8A;
+        }
+        .alert-success {
+            background-color: #F0FDF4;
+            border-color: #22C55E;
+            color: #166534;
+        }
+        .alert-warning {
+            background-color: #FFF7ED;
+            border-color: #F59E0B;
+            color: #92400E;
+        }
+        .alert-purple {
+            background-color: #FAF5FF;
+            border-color: #A855F7;
+            color: #6B21A8;
+        }
+        .response-box {
+            background: white;
+            border: 1px solid #E8E9E9;
+            border-radius: 8px;
+            padding: 16px;
+            max-height: 384px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #374151;
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @media (max-width: 768px) {
+            .grid-2, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        const WritingPromptBuilder = () => {
+            const [currentStep, setCurrentStep] = useState(0);
+            const [promptElements, setPromptElements] = useState({
+                contentType: '',
+                topic: '',
+                purpose: '',
+                audience: '',
+                tone: '',
+                length: '',
+                format: '',
+                examples: '',
+                constraints: ''
+            });
+            const [firstResponse, setFirstResponse] = useState('');
+            const [secondResponse, setSecondResponse] = useState('');
+            const [reflections, setReflections] = useState({
+                whatWorked: '',
+                whatDidntWork: '',
+                whatToChange: ''
+            });
+            const [finalReflections, setFinalReflections] = useState({
+                whichBetter: '',
+                toneMatch: '',
+                biggestChange: '',
+                keyLearning: ''
+            });
+            const [isGenerating, setIsGenerating] = useState(false);
+
+            const contentTypes = [
+                { id: 'email', label: 'Correo/Mensaje', emoji: '📧' },
+                { id: 'report', label: 'Informe', emoji: '📊' },
+                { id: 'presentation', label: 'Contenido de Presentación', emoji: '📽️' },
+                { id: 'proposal', label: 'Propuesta', emoji: '💼' },
+                { id: 'summary', label: 'Resumen Ejecutivo', emoji: '📄' },
+                { id: 'documentation', label: 'Documentación', emoji: '📝' },
+                { id: 'article', label: 'Artículo/Blog', emoji: '✍️' },
+                { id: 'social', label: 'Publicación en Redes', emoji: '📱' }
+            ];
+
+            const purposes = [
+                'Informar/Educar (explicar, enseñar)',
+                'Persuadir/Convencer (cambiar opiniones, obtener aprobación)',
+                'Inspirar/Motivar (energizar, alentar acción)',
+                'Anunciar/Actualizar (compartir noticias, informar cambios)',
+                'Solicitar/Proponer (pedir algo, sugerir ideas)',
+                'Documentar/Registrar (capturar información, crear referencia)'
+            ];
+
+            const tones = [
+                'Profesional (apropiado para negocios, pulido)',
+                'Casual/Conversacional (relajado, accesible)',
+                'Formal (oficial, tradicional)',
+                'Amigable (cálido, personal)',
+                'Autoritario (experto, confiado)',
+                'Empático (comprensivo, solidario)'
+            ];
+
+            const steps = ['Construir', 'Probar & Analizar', 'Mejorar', 'Comparar & Aprender'];
+
+            const updateElement = (key, value) => {
+                setPromptElements(prev => ({ ...prev, [key]: value }));
+            };
+
+            const updateReflection = (key, value) => {
+                setReflections(prev => ({ ...prev, [key]: value }));
+            };
+
+            const updateFinalReflection = (key, value) => {
+                setFinalReflections(prev => ({ ...prev, [key]: value }));
+            };
+
+            const buildPrompt = () => {
+                let parts = [];
+                
+                if (promptElements.contentType) {
+                    const type = contentTypes.find(t => t.id === promptElements.contentType);
+                    parts.push('Escribe ' + type.label.toLowerCase());
+                }
+                
+                if (promptElements.topic) {
+                    parts.push('sobre ' + promptElements.topic);
+                }
+                
+                let prompt = parts.join(' ') + '.';
+                
+                const details = [];
+                if (promptElements.purpose) details.push('Propósito: ' + promptElements.purpose);
+                if (promptElements.audience) details.push('Audiencia: ' + promptElements.audience);
+                if (promptElements.tone) details.push('Tono: ' + promptElements.tone);
+                if (promptElements.length) details.push('Extensión: ' + promptElements.length);
+                
+                if (details.length > 0) {
+                    prompt += '\n\n' + details.join('\n');
+                }
+                
+                if (promptElements.format) {
+                    prompt += '\n\nFormato: ' + promptElements.format;
+                }
+                
+                if (promptElements.examples) {
+                    prompt += '\n\nReferencia de estilo: ' + promptElements.examples;
+                }
+                
+                if (promptElements.constraints) {
+                    prompt += '\n\nRequisitos: ' + promptElements.constraints;
+                }
+                
+                return prompt.trim();
+            };
+
+            const generateResponse = async (isRevised) => {
+                const prompt = buildPrompt();
+                setIsGenerating(true);
+                
+                try {
+                    const response = await fetch("https://api.anthropic.com/v1/messages", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            model: "claude-sonnet-4-20250514",
+                            max_tokens: 1500,
+                            messages: [{ role: "user", content: prompt }],
+                        })
+                    });
+
+                    const data = await response.json();
+                    const text = data.content.find(item => item.type === "text")?.text || "¡Respuesta generada!";
+                    
+                    if (isRevised) {
+                        setSecondResponse(text);
+                    } else {
+                        setFirstResponse(text);
+                    }
+                } catch (error) {
+                    const fallback = "Error al generar respuesta. Por favor intenta de nuevo.";
+                    if (isRevised) {
+                        setSecondResponse(fallback);
+                    } else {
+                        setFirstResponse(fallback);
+                    }
+                } finally {
+                    setIsGenerating(false);
+                }
+            };
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text);
+                alert('Copiado al portapapeles');
+            };
+
+            const exportProject = () => {
+                const content = `PROYECTO DE APRENDIZAJE DE PROMPTS
+================================
+
+PROMPT INICIAL:
+${buildPrompt()}
+
+PRIMERA RESPUESTA DE IA:
+${firstResponse}
+
+---
+
+REFLEXIÓN:
+Qué funcionó: ${reflections.whatWorked}
+Qué no funcionó: ${reflections.whatDidntWork}
+Qué cambié: ${reflections.whatToChange}
+
+---
+
+PROMPT REVISADO:
+${buildPrompt()}
+
+RESPUESTA MEJORADA:
+${secondResponse}
+
+---
+
+REFLEXIÓN FINAL:
+Cuál fue mejor: ${finalReflections.whichBetter}
+Coincidencia de tono: ${finalReflections.toneMatch}
+Mayor cambio: ${finalReflections.biggestChange}
+Aprendizaje clave: ${finalReflections.keyLearning}`;
+                
+                const blob = new Blob([content], { type: 'text/plain; charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'aprendizaje-prompts.txt';
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            const renderStep0 = () => {
+                const currentPrompt = buildPrompt();
+                
+                return (
+                    <div className="space-y-6">
+                        <div className="alert alert-info">
+                            ¡Comencemos! Completa los campos para crear un prompt profesional y efectivo.
+                        </div>
+
+                        <div>
+                            <label className="label">1. Tipo de Contenido *</label>
+                            <div className="grid-4">
+                                {contentTypes.map(type => (
+                                    <button
+                                        key={type.id}
+                                        onClick={() => updateElement('contentType', type.id)}
+                                        className={`content-type-btn ${promptElements.contentType === type.id ? 'active' : ''}`}
+                                    >
+                                        <div style={{fontSize: '24px', marginBottom: '4px'}}>{type.emoji}</div>
+                                        <div style={{fontSize: '12px', fontWeight: 500}}>{type.label}</div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="label">2. ¿Sobre qué estás escribiendo? (Sé específico) *</label>
+                            <input
+                                type="text"
+                                value={promptElements.topic}
+                                onChange={(e) => updateElement('topic', e.target.value)}
+                                placeholder="Ejemplo: El impacto del trabajo remoto en la colaboración de equipos de desarrollo"
+                                className="input-field"
+                            />
+                            <p className="helper-text">¡Mientras más específico seas, mejores resultados!</p>
+                        </div>
+
+                        <div className="grid-2">
+                            <div>
+                                <label className="label">3. ¿Cuál es el propósito?</label>
+                                <select 
+                                    value={promptElements.purpose} 
+                                    onChange={(e) => updateElement('purpose', e.target.value)}
+                                    className="input-field"
+                                >
+                                    <option value="">Seleccionar...</option>
+                                    {purposes.map(p => <option key={p} value={p}>{p}</option>)}
+                                </select>
+                                <p className="helper-text">¿Qué quieres que los lectores hagan o sientan?</p>
+                            </div>
+                            <div>
+                                <label className="label">4. ¿Qué tono?</label>
+                                <select 
+                                    value={promptElements.tone} 
+                                    onChange={(e) => updateElement('tone', e.target.value)}
+                                    className="input-field"
+                                >
+                                    <option value="">Seleccionar...</option>
+                                    {tones.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                                <p className="helper-text">Elige la voz que se ajuste a tu audiencia</p>
+                            </div>
+                        </div>
+
+                        <div className="grid-2">
+                            <div>
+                                <label className="label">5. ¿Quién es tu audiencia?</label>
+                                <input 
+                                    type="text" 
+                                    value={promptElements.audience} 
+                                    onChange={(e) => updateElement('audience', e.target.value)}
+                                    placeholder="ej., fundadores de startups, administradores"
+                                    className="input-field"
+                                />
+                                <p className="helper-text">¿Quién leerá esto? Sé específico sobre su rol</p>
+                            </div>
+                            <div>
+                                <label className="label">6. ¿Qué extensión?</label>
+                                <input 
+                                    type="text" 
+                                    value={promptElements.length} 
+                                    onChange={(e) => updateElement('length', e.target.value)}
+                                    placeholder="ej., 500 palabras, 3 párrafos"
+                                    className="input-field"
+                                />
+                                <p className="helper-text">Ejemplos: palabras, párrafos, páginas</p>
+                            </div>
+                        </div>
+
+                        <div style={{borderTop: '2px solid #FF7A00', paddingTop: '24px', marginTop: '24px'}}>
+                            <h3 style={{fontSize: '18px', fontWeight: 700, marginBottom: '16px'}}>📋 Detalles Críticos para Mejores Resultados</h3>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="label">7. Requisitos de Formato/Estructura</label>
+                                    <textarea 
+                                        value={promptElements.format} 
+                                        onChange={(e) => updateElement('format', e.target.value)}
+                                        placeholder="ej., Comenzar con gancho, 3 secciones con encabezados, viñetas, llamada a la acción"
+                                        className="textarea-field"
+                                    />
+                                    <p className="helper-text">¿Cómo debe organizarse el contenido?</p>
+                                </div>
+
+                                <div>
+                                    <label className="label">8. Ejemplos de Estilo o Referencias</label>
+                                    <textarea 
+                                        value={promptElements.examples} 
+                                        onChange={(e) => updateElement('examples', e.target.value)}
+                                        placeholder="ej., Escribe como Harvard Business Review - basado en datos pero accesible"
+                                        className="textarea-field"
+                                    />
+                                    <p className="helper-text">¡Mostrar ejemplos es poderoso!</p>
+                                </div>
+
+                                <div>
+                                    <label className="label">9. Requisitos Especiales o Restricciones</label>
+                                    <textarea 
+                                        value={promptElements.constraints} 
+                                        onChange={(e) => updateElement('constraints', e.target.value)}
+                                        placeholder="ej., Incluir 2-3 estadísticas, evitar jerga técnica"
+                                        className="textarea-field"
+                                    />
+                                    <p className="helper-text">¿Qué debe incluirse o evitarse?</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{background: '#F9FAFB', border: '1px solid #E8E9E9', borderRadius: '8px', padding: '16px'}}>
+                            <label className="label">Vista Previa del Prompt:</label>
+                            <div className="response-box" style={{maxHeight: '192px'}}>
+                                {currentPrompt || 'Completa los campos anteriores...'}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderStep1 = () => {
+                const currentPrompt = buildPrompt();
+                
+                return (
+                    <div className="space-y-6">
+                        <div className="alert alert-success">
+                            ¡Listo para ver qué produce tu prompt! Genera contenido real de IA y analiza los resultados.
+                        </div>
+
+                        <div style={{background: '#F9FAFB', border: '1px solid #E8E9E9', borderRadius: '8px', padding: '16px'}}>
+                            <label className="label">Tu Prompt:</label>
+                            <div className="response-box" style={{maxHeight: '192px'}}>
+                                {currentPrompt}
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={() => generateResponse(false)} 
+                            disabled={!promptElements.contentType || !promptElements.topic || isGenerating}
+                            className="btn-primary"
+                            style={{width: '100%', padding: '16px', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
+                        >
+                            {isGenerating ? (
+                                <>
+                                    <span className="animate-spin" style={{display: 'inline-block'}}>⟳</span>
+                                    Generando...
+                                </>
+                            ) : (
+                                <>
+                                    ✨ Generar Contenido
+                                </>
+                            )}
+                        </button>
+
+                        {firstResponse && (
+                            <>
+                                <div style={{background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px', padding: '24px'}}>
+                                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                                        <h3 style={{fontWeight: 700, color: '#1E40AF'}}>Contenido Generado por IA:</h3>
+                                        <button onClick={() => copyToClipboard(firstResponse)} className="btn-secondary" style={{padding: '8px 16px', fontSize: '14px'}}>
+                                            📋 Copiar
+                                        </button>
+                                    </div>
+                                    <div className="response-box">
+                                        {firstResponse}
+                                    </div>
+                                </div>
+
+                                <div className="alert alert-warning" style={{marginTop: '24px'}}>
+                                    <p style={{fontWeight: 600, marginBottom: '12px'}}>🔍 Ahora analiza los resultados:</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="label">✅ ¿Qué funcionó bien?</label>
+                                        <textarea 
+                                            value={reflections.whatWorked} 
+                                            onChange={(e) => updateReflection('whatWorked', e.target.value)}
+                                            placeholder="ej., El tono fue perfecto, buena estructura..."
+                                            className="textarea-field"
+                                            style={{minHeight: '128px'}}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="label">❌ ¿Qué no funcionó?</label>
+                                        <textarea 
+                                            value={reflections.whatDidntWork} 
+                                            onChange={(e) => updateReflection('whatDidntWork', e.target.value)}
+                                            placeholder="ej., Demasiado formal, faltaron ejemplos..."
+                                            className="textarea-field"
+                                            style={{minHeight: '128px'}}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="label">🔧 ¿Qué cambiarás?</label>
+                                        <textarea 
+                                            value={reflections.whatToChange} 
+                                            onChange={(e) => updateReflection('whatToChange', e.target.value)}
+                                            placeholder="ej., Agregar tono casual, incluir ejemplos..."
+                                            className="textarea-field"
+                                            style={{minHeight: '128px'}}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div style={{background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: '8px', padding: '16px'}}>
+                                    <h4 style={{fontWeight: 600, color: '#1E40AF', marginBottom: '8px'}}>Soluciones Comunes:</h4>
+                                    <div style={{fontSize: '14px', color: '#1E3A8A'}}>
+                                        <div>Muy vago → Agrega detalles específicos</div>
+                                        <div>Tono incorrecto → Sé más específico</div>
+                                        <div>Extensión incorrecta → Da conteo exacto</div>
+                                        <div>Estructura pobre → Describe el formato</div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                );
+            };
+
+            const renderStep2 = () => {
+                return (
+                    <div className="space-y-6">
+                        <div className="alert alert-purple">
+                            ✏️ Revisa tu prompt basándote en tu análisis. Usa el resumen abajo como guía.
+                        </div>
+
+                        <div style={{background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '8px', padding: '16px'}}>
+                            <h4 style={{fontWeight: 600, color: '#92400E', marginBottom: '8px'}}>Tu Plan de Cambios:</h4>
+                            <div style={{fontSize: '14px', color: '#78350F', whiteSpace: 'pre-wrap'}}>
+                                {reflections.whatToChange || 'No se identificaron cambios aún'}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="label">Tipo de Contenido y Tema</label>
+                                <div className="grid-4" style={{marginBottom: '8px'}}>
+                                    {contentTypes.map(type => (
+                                        <button 
+                                            key={type.id} 
+                                            onClick={() => updateElement('contentType', type.id)}
+                                            className={`content-type-btn ${promptElements.contentType === type.id ? 'active' : ''}`}
+                                            style={{padding: '8px'}}
+                                        >
+                                            <div style={{fontSize: '20px'}}>{type.emoji}</div>
+                                            <div style={{fontSize: '10px'}}>{type.label}</div>
+                                        </button>
+                                    ))}
+                                </div>
+                                <input 
+                                    type="text" 
+                                    value={promptElements.topic} 
+                                    onChange={(e) => updateElement('topic', e.target.value)}
+                                    placeholder="Tema específico"
+                                    className="input-field"
+                                />
+                            </div>
+
+                            <div className="grid-2">
+                                <div>
+                                    <label className="label">Propósito</label>
+                                    <select 
+                                        value={promptElements.purpose} 
+                                        onChange={(e) => updateElement('purpose', e.target.value)}
+                                        className="input-field"
+                                        style={{fontSize: '14px'}}
+                                    >
+                                        <option value="">Seleccionar...</option>
+                                        {purposes.map(p => <option key={p} value={p}>{p}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="label">Tono</label>
+                                    <select 
+                                        value={promptElements.tone} 
+                                        onChange={(e) => updateElement('tone', e.target.value)}
+                                        className="input-field"
+                                        style={{fontSize: '14px'}}
+                                    >
+                                        <option value="">Seleccionar...</option>
+                                        {tones.map(t => <option key={t} value={t}>{t}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid-2">
+                                <div>
+                                    <label className="label">Audiencia</label>
+                                    <input 
+                                        type="text" 
+                                        value={promptElements.audience} 
+                                        onChange={(e) => updateElement('audience', e.target.value)}
+                                        placeholder="¿Quién leerá esto?"
+                                        className="input-field"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="label">Extensión</label>
+                                    <input 
+                                        type="text" 
+                                        value={promptElements.length} 
+                                        onChange={(e) => updateElement('length', e.target.value)}
+                                        placeholder="¿Qué tan largo?"
+                                        className="input-field"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="label">Formato/Estructura</label>
+                                <textarea 
+                                    value={promptElements.format} 
+                                    onChange={(e) => updateElement('format', e.target.value)}
+                                    placeholder="Describe la estructura..."
+                                    className="textarea-field"
+                                    style={{minHeight: '80px'}}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="label">Ejemplos de Estilo</label>
+                                <textarea 
+                                    value={promptElements.examples} 
+                                    onChange={(e) => updateElement('examples',
