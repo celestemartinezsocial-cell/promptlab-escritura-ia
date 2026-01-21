@@ -196,29 +196,6 @@
     }
 };
         
-        if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            console.error('Error response:', errorData);
-            throw new Error(errorData.error?.message || `Error ${res.status}`);
-        }
-        
-        const json = await res.json();
-        const text = json.content?.find(i => i.type === "text")?.text || "";
-        
-        if (!text) {
-            throw new Error("No se recibió contenido");
-        }
-        
-        isRevised ? setResp2(text) : setResp1(text);
-        
-    } catch (e) {
-        console.error('Error completo:', e);
-        const errorMsg = `❌ Error: ${e.message}\n\nIntenta de nuevo o simplifica tu solicitud.`;
-        isRevised ? setResp2(errorMsg) : setResp1(errorMsg);
-    } finally {
-        setLoading(false);
-    }
-};
             const copy = (text) => {
                 navigator.clipboard.writeText(text);
                 alert('Copiado');
