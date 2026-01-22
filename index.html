@@ -231,7 +231,30 @@
             a.download = 'promptlab-proyecto.txt';
             a.click();
         };
-
+const exportToWord = () => {
+    const content = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+        <head><meta charset='utf-8'><title>PromptLab Export</title></head>
+        <body>
+            <h1>PromptLab - Proyecto</h1>
+            <h2>Prompt Inicial</h2>
+            <p>${buildPrompt().replace(/\n/g, '<br>')}</p>
+            <h2>Primera Versión</h2>
+            <p>${resp1.replace(/\n/g, '<br>')}</p>
+            ${resp2 ? `<h2>Versión Mejorada</h2><p>${resp2.replace(/\n/g, '<br>')}</p>` : ''}
+            <h2>Aprendizajes</h2>
+            <p>${finalRef.learning || 'Sin aprendizajes registrados'}</p>
+        </body>
+        </html>
+    `;
+    const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'promptlab-proyecto.doc';
+    a.click();
+    URL.revokeObjectURL(url);
+};
         return (
             <div className="container">
                 <div className="card">
@@ -668,9 +691,14 @@
                                         <p style={{fontSize: '14px', color: '#15803D', marginBottom: '4px'}}>✓ Pequeños cambios = grandes mejoras</p>
                                         <p style={{fontSize: '14px', color: '#15803D', marginBottom: '4px'}}>✓ La especificidad es clave</p>
                                         <p style={{fontSize: '14px', color: '#15803D', marginBottom: '16px'}}>✓ Los ejemplos son poderosos</p>
-                                        <button onClick={exportData} className="btn-primary">
-                                            💾 Exportar Proyecto
-                                        </button>
+                                        <div style={{display: 'flex', gap: '8px'}}>
+    <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
+        📄 Exportar TXT
+    </button>
+    <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
+        📘 Exportar Word
+    </button>
+</div>
                                     </div>
                                 </>
                             )}
