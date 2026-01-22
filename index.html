@@ -438,6 +438,17 @@
                                 />
                                 <p className="helper-text">Agrega cualquier detalle específico que Claude deba considerar</p>
                                 </div>
+                                <div>
+                                <label className="label">Instrucciones adicionales (opcional)</label>
+                                <textarea 
+                                value={data.additionalInstructions || ''} 
+                                onChange={(e) => update('additionalInstructions', e.target.value)} 
+                                className="textarea-field" 
+                                placeholder="Ej: Incluye 3 CTAs, menciona nuestra promoción de enero, evita jerga técnica, usa datos específicos..."
+                                rows="3"
+                                />
+                                <p className="helper-text">Agrega cualquier detalle específico que Claude deba considerar</p>
+                                </div>
                                 <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || loading}
                                     className="btn-primary">
                                     {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
