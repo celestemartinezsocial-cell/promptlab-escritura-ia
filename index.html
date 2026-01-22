@@ -434,6 +434,16 @@
                                     <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
                                 </div>
                                 <div>
+                                <label className="label">Palabras/términos clave a incluir (opcional)</label>
+                                <input 
+                                type="text"
+                                value={data.keywords || ''} 
+                                onChange={(e) => update('keywords', e.target.value)} 
+                                className="input-field"
+                                placeholder="Ej: innovación, sostenibilidad, ROI, transformación digital"
+                                />
+                                <p className="helper-text">Separa con comas las palabras que Claude debe incluir en el contenido</p>
+                                </div>
                                 <label className="label">Instrucciones adicionales (opcional)</label>
                                 <textarea 
                                 value={data.additionalInstructions || ''} 
