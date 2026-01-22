@@ -175,7 +175,7 @@
                 if (data.format) p += `\n\nFormato: ${data.format}`;
                 if (data.examples) p += `\n\nEstilo: ${data.examples}`;
                 if (data.constraints) p += `\n\nRequisitos: ${data.constraints}`;
-                
+                if (data.additionalInstructions) p += `\n\nInstrucciones adicionales: ${data.additionalInstructions}`;
                 p += `\n\n[ESTILO CRÍTICO]: Sé directo y auténtico. NO uses frases cliché como "en el mundo de hoy", "es fundamental", "cabe destacar". NO uses lenguaje corporativo vacío. Escribe como un humano real, no como un robot. Prioriza claridad sobre elegancia.`;
                 
                 return p.trim();
@@ -427,7 +427,17 @@
                                     <label className="label">Tu Prompt:</label>
                                     <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
                                 </div>
-
+                                <div>
+                                <label className="label">Instrucciones adicionales (opcional)</label>
+                                <textarea 
+                                value={data.additionalInstructions || ''} 
+                                onChange={(e) => update('additionalInstructions', e.target.value)} 
+                                className="textarea-field" 
+                                placeholder="Ej: Incluye 3 CTAs, menciona nuestra promoción de enero, evita jerga técnica, usa datos específicos..."
+                                rows="3"
+                                />
+                                <p className="helper-text">Agrega cualquier detalle específico que Claude deba considerar</p>
+                                </div>
                                 <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || loading}
                                     className="btn-primary">
                                     {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
