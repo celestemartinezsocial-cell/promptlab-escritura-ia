@@ -461,7 +461,10 @@
                                 <p className="helper-text">Agrega cualquier detalle específico que Claude deba considerar</p>
                             </div>
 
-                            <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || !data.purpose || !data.audience || !data.tone || loading}
+                            <button onClick={() => generate(false)} 
+                                disabled={!data.contentType || !data.topic || !data.purpose || !data.audience || !data.tone || loading}
+                                className="btn-primary"
+                            >
                                 {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
                             </button>
 
