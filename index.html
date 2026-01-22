@@ -231,8 +231,8 @@
             a.download = 'promptlab-proyecto.txt';
             a.click();
         };
-const exportToWord = () => {
-    const content = `
+        const exportToWord = () => {
+            const content = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
         <head><meta charset='utf-8'><title>PromptLab Export</title></head>
         <body>
@@ -692,13 +692,13 @@ const exportToWord = () => {
                                         <p style={{fontSize: '14px', color: '#15803D', marginBottom: '4px'}}>✓ La especificidad es clave</p>
                                         <p style={{fontSize: '14px', color: '#15803D', marginBottom: '16px'}}>✓ Los ejemplos son poderosos</p>
                                         <div style={{display: 'flex', gap: '8px'}}>
-    <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
-        📄 Exportar TXT
-    </button>
-    <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
-        📘 Exportar Word
-    </button>
-</div>
+                                    <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
+                                    📄 Exportar TXT
+                                    </button>
+                                    <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
+                                    📘 Exportar Word
+                                    </button>
+                                </div>
                                     </div>
                                 </>
                             )}
