@@ -511,24 +511,16 @@
                             <div className="alert alert-purple">
                                 ✏️ Revisa tu prompt basándote en tu análisis.
                             </div>
-
-                            <div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
-                                <label className="label">Tu Plan:</label>
-                                <p style={{fontSize: '14px'}}>{ref.change || 'No hay cambios aún'}</p>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="grid-4">
-                                    {types.map(t => (
-                                        <button key={t.id} onClick={() => update('contentType', t.id)}
-                                            className={`content-btn ${data.contentType === t.id ? 'active' : ''}`}
-                                            style={{padding: '8px'}}>
-                                            <div style={{fontSize: '20px'}}>{t.emoji}</div>
-                                            <div style={{fontSize: '10px'}}>{t.label}</div>
-                                        </button>
-                                    ))}
-                                </div>
-
+                        <div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
+                        <label className="label">📋 Tu Plan de Mejora:</label>
+                        <p style={{fontSize: '14px', marginBottom: '12px', fontStyle: 'italic'}}>"{ref.change || 'No hay cambios aún'}"</p>
+                        <div style={{background: '#FED7AA', padding: '12px', borderRadius: '6px', marginTop: '12px'}}>
+                        <p style={{fontSize: '13px', color: '#92400E', fontWeight: 600, margin: 0}}>
+                        ⚠️ Importante: Ahora edita los campos de abajo para aplicar estos cambios. 
+                        El prompt no se actualiza automáticamente.
+                        </p>
+                </div>
+            </div>
                                 {data.contentType === 'documentation' && (
                                     <select value={data.docSubtype} onChange={(e) => update('docSubtype', e.target.value)} className="input-field">
                                         <option value="">Tipo de documento...</option>
