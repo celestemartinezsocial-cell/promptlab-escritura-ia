@@ -528,84 +528,73 @@
                             )}
                         </div>
                     )}
-
-                   {step === 2 && (
+{step === 2 && (
     <div className="space-y-6">
         <div className="alert alert-blue">
-    ✏️ Revisa tu prompt basándote en tu análisis.
-</div>
+            <strong>🎯 Paso 3: Mejora tu Prompt</strong><br/><br/>
+            👇 Revisa tu plan y genera la versión mejorada.
+        </div>
 
         <div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
             <label className="label">📋 Tu Plan de Mejora:</label>
             <p style={{fontSize: '14px', marginBottom: '12px', fontStyle: 'italic'}}>"{ref.change || 'No hay cambios aún'}"</p>
             <div style={{background: '#FED7AA', padding: '12px', borderRadius: '6px', marginTop: '12px'}}>
                 <p style={{fontSize: '13px', color: '#92400E', fontWeight: 600, margin: 0}}>
-                    ⚠️ Importante: Ahora edita los campos de abajo para aplicar estos cambios. 
-                    El prompt no se actualiza automáticamente.
+                    💡 Tip: Si quieres hacer cambios específicos a tu prompt, vuelve al Paso 1 usando el botón "← Atrás"
                 </p>
             </div>
         </div>
 
         <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
-            <label className="label">Prompt Revisado:</label>
-            <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
+            <label className="label">Tu Prompt Actual:</label>
+            <div className="response-box" style={{maxHeight: '200px'}}>{buildPrompt()}</div>
         </div>
 
-        <div className="space-y-4">
-            <div className="grid-4">
-                {types.map(t => (
-                    <button key={t.id} onClick={() => update('contentType', t.id)}
-                        className={`content-btn ${data.contentType === t.id ? 'active' : ''}`}
-                        style={{padding: '8px'}}>
-                        <div style={{fontSize: '20px'}}>{t.emoji}</div>
-                        <div style={{fontSize: '10px'}}>{t.label}</div>
-                    </button>
-                ))}
-            </div>
-        {data.contentType === 'documentation' && (
-                                    <select value={data.docSubtype} onChange={(e) => update('docSubtype', e.target.value)} className="input-field">
-                                        <option value="">Tipo de documento...</option>
-                                        {docSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
-                                    </select>
-                                )}
+        <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
+            {loading ? '⟳ Generando...' : '✨ Generar Versión Mejorada'}
+        </button>
 
-                                {data.contentType === 'social' && (
-                                    <select value={data.socialSubtype} onChange={(e) => update('socialSubtype', e.target.value)} className="input-field">
-                                        <option value="">Red social...</option>
-                                        {Object.keys(socialSubtypes).map(sn => <option key={sn} value={sn}>{sn}</option>)}
-                                    </select>
-                                )}
-
-                                <input type="text" value={data.topic} onChange={(e) => update('topic', e.target.value)}
-                                    placeholder="Tema" className="input-field" />
-
-                                <div className="grid-2">
-                                    <select value={data.purpose} onChange={(e) => update('purpose', e.target.value)} className="input-field">
-                                        <option value="">Propósito...</option>
-                                        {purposes.map(p => <option key={p} value={p}>{p}</option>)}
-                                    </select>
-                                    <select value={data.tone} onChange={(e) => update('tone', e.target.value)} className="input-field">
-                                        <option value="">Tono...</option>
-                                        {tones.map(t => <option key={t} value={t}>{t}</option>)}
-                                    </select>
-                                </div>
-
-                                <div className="grid-2">
-                                    <input type="text" value={data.audience} onChange={(e) => update('audience', e.target.value)}
-                                        placeholder="Audiencia" className="input-field" />
-                                    <input type="text" value={data.length} onChange={(e) => update('length', e.target.value)}
-                                        placeholder="Extensión" className="input-field" />
-                                </div>
-
-                                <textarea value={data.format} onChange={(e) => update('format', e.target.value)}
-                                    placeholder="Formato" className="textarea-field" style={{minHeight: '80px'}}></textarea>
-                                <textarea value={data.examples} onChange={(e) => update('examples', e.target.value)}
-                                    placeholder="Ejemplos" className="textarea-field" style={{minHeight: '80px'}}></textarea>
-                                <textarea value={data.constraints} onChange={(e) => update('constraints', e.target.value)}
-                                    placeholder="Requisitos" className="textarea-field" style={{minHeight: '80px'}}></textarea>
-                            </div>
+        {resp2 && (
+            <>
+                <div>
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '16px'}}>
+                        <h3 style={{fontSize: '18px', fontWeight: 600}}>Compara tus resultados</h3>
                     </div>
-                    )}
+                    <div className="grid-2">
+                        <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                                <label className="label">📄 Primera versión</label>
+                                <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
+                                    📋 Copiar
+                                </button>
+                            </div>
+                            <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp1}</div>
+                            <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
+                                <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
+                                    📊 {resp1.split(' ').length} palabras
+                                </p>
+                            </div>
+                        </div>
+                        <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                                <label className="label">✨ Versión mejorada</label>
+                                <button onClick={() => copy(resp2)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
+                                    📋 Copiar
+                                </button>
+                            </div>
+                            <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp2}</div>
+                            <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
+                                <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
+                                    📊 {resp2.split(' ').length} palabras
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        )}
+    </div>
+)}
 
                     {step === 3 && (
                         <div className="space-y-6">
