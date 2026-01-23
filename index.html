@@ -436,6 +436,29 @@
                                         <textarea value={data.constraints} onChange={(e) => update('constraints', e.target.value)}
                                             placeholder="Ej: Incluir 2-3 estadísticas, evitar jerga"
                                             className="textarea-field"></textarea>
+                                        <div>
+                                        <label className="label">10. Palabras clave (opcional)</label>
+                                        <input 
+                                            type="text"
+                                            value={data.keywords || ''}     
+                                            onChange={(e) => update('keywords', e.target.value)} 
+                                            className="input-field"
+                                            placeholder="Ej: innovación, sostenibilidad, ROI, transformación digital"
+                                        />
+                                        <p className="helper-text">Palabras que DEBEN aparecer en el contenido</p>
+                                        </div>
+
+                                        <div>
+                                        <label className="label">11. Instrucciones adicionales (opcional)</label>
+                                        <textarea 
+                                            value={data.additionalInstructions || ''} 
+                                            onChange={(e) => update('additionalInstructions', e.target.value)} 
+                                            className="textarea-field" 
+                                            placeholder="Ej: Incluye 3 CTAs, menciona nuestra promoción de enero, usa datos específicos..."
+                                            rows="2"
+                                        />
+                                        <p className="helper-text">Detalles específicos únicos de esta tarea</p>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -458,30 +481,6 @@
                             <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
                                 <label className="label">Tu Prompt:</label>
                                 <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
-                            </div>
-
-                            <div>
-                                <label className="label">Palabras/términos clave a incluir (opcional)</label>
-                                <input 
-                                    type="text"
-                                    value={data.keywords || ''} 
-                                    onChange={(e) => update('keywords', e.target.value)} 
-                                    className="input-field"
-                                    placeholder="Ej: innovación, sostenibilidad, ROI, transformación digital"
-                                />
-                                <p className="helper-text">Separa con comas las palabras que Claude debe incluir en el contenido</p>
-                            </div>
-
-                            <div>
-                                <label className="label">Instrucciones adicionales (opcional)</label>
-                                <textarea 
-                                    value={data.additionalInstructions || ''} 
-                                    onChange={(e) => update('additionalInstructions', e.target.value)} 
-                                    className="textarea-field" 
-                                    placeholder="Ej: Incluye 3 CTAs, menciona nuestra promoción de enero, evita jerga técnica, usa datos específicos..."
-                                    rows="3"
-                                />
-                                <p className="helper-text">Agrega cualquier detalle específico que Claude deba considerar</p>
                             </div>
 
                             <button onClick={() => generate(false)} 
