@@ -209,7 +209,13 @@
             return p.trim();
         };
 
-        const generate = async (isRevised) => {
+       const generate = async (isRevised) => {
+    // ⭐ VERIFICAR LÍMITES ANTES DE GENERAR ⭐
+    if (!window.promptLabLimits.canGenerate()) {
+        window.promptLabLimits.showUpgradeModal();
+        return;
+    }
+
     setLoading(true);
     
     try {
@@ -275,6 +281,9 @@ INSTRUCCIONES CRÍTICAS:
         }
         
         isRevised ? setResp2(text) : setResp1(text);
+        
+        // ⭐ INCREMENTAR CONTADOR DESPUÉS DE GENERAR EXITOSAMENTE ⭐
+        window.promptLabLimits.incrementUsage();
         
     } catch (e) {
         console.error('Error:', e);
