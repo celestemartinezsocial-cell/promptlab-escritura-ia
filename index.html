@@ -211,33 +211,55 @@
 
         const generate = async (isRevised) => {
     setLoading(true);
-    let prompt = buildPrompt();
-    
-    // Si es versión mejorada, incluir el contenido anterior como contexto
-    if (isRevised && resp1) {
-        prompt = `Tengo este contenido que generé previamente:
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${resp1}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Ahora necesito que MEJORES este contenido aplicando estos cambios específicos:
-
-${prompt}
-
-INSTRUCCIONES CRÍTICAS:
-1. MANTÉN las ideas principales y estructura que funcionaron bien
-2. APLICA específicamente los cambios solicitados en el prompt (tono, extensión, palabras clave, etc.)
-3. Si el prompt pide un tono diferente, ajusta SOLO el tono manteniendo el contenido
-4. Si pide agregar palabras clave, incorpóralas naturalmente sin reescribir todo
-5. Haz mejoras incrementales y precisas, NO generes contenido completamente nuevo`;
-    }
     
     try {
+        let requestBody;
+        
+        if (isRevised && resp1) {
+            // Enviar conversación con memoria real
+            const currentPrompt = buildPrompt();
+            const improvementPlan = ref.change || 'Mejorar el contenido según los ajustes en el prompt';
+            
+            requestBody = {
+                messages: [
+                    { 
+                        role: "user", 
+                        content: buildPrompt() // El prompt original que generó resp1
+                    },
+                    { 
+                        role: "assistant", 
+                        content: resp1 
+                    },
+                    { 
+                        role: "user", 
+                        content: `Ahora necesito que mejores el contenido anterior aplicando estos cambios específicos:
+
+📝 Plan de mejora: ${improvementPlan}
+
+🎯 Nuevo prompt con ajustes:
+${currentPrompt}
+
+INSTRUCCIONES CRÍTICAS:
+1. MANTÉN las ideas principales y estructura que funcionaron bien del contenido anterior
+2. APLICA específicamente los cambios solicitados (tono, extensión, palabras clave, formato, etc.)
+3. Si cambió el tono, ajusta SOLO el tono manteniendo el contenido
+4. Si cambió la extensión, ajusta la longitud sin perder información clave
+5. Si hay nuevas instrucciones adicionales, aplícalas sobre el contenido existente
+6. Haz mejoras incrementales y precisas sobre el texto anterior, NO generes contenido completamente nuevo desde cero`
+                    }
+                ]
+            };
+        } else {
+            // Primera generación sin memoria
+            requestBody = {
+                prompt: buildPrompt()
+            };
+        }
+        
         const res = await fetch("/api/generate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify(requestBody)
         });
         
         if (!res.ok) {
@@ -262,7 +284,6 @@ INSTRUCCIONES CRÍTICAS:
         setLoading(false);
     }
 };
-    
         const copy = (text) => {
             navigator.clipboard.writeText(text);
             alert('Copiado');
