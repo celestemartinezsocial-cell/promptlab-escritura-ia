@@ -42,6 +42,13 @@
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+    <style>
+        /* Ocultar modales por defecto */
+        #upgrade-modal,
+        #register-modal,
+        #activate-modal {
+            display: none;
+        }
     </style>
 </head>
 <body>
