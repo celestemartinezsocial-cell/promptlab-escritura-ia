@@ -880,6 +880,175 @@ INSTRUCCIONES CRÍTICAS:
 
     ReactDOM.render(<App />, document.getElementById('root'));
     </script>
+    <!-- Modal de Upgrade -->
+<div class="modal fade" id="upgrade-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">¡Has generado 10 prompts esta semana!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <span style="font-size: 48px;">🎯</span>
+                    <p class="text-muted mt-2">Excelente progreso. Tienes opciones para continuar:</p>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title">⏰ Espera hasta el lunes</h6>
+                        <p class="card-text small">
+                            Tu contador se resetea en <span id="days-until-reset">X</span> días. 
+                            PromptLab siempre será gratuito.
+                        </p>
+                    </div>
+                </div>
+
+                <div id="register-section" class="card mb-3 border-primary">
+                    <div class="card-body bg-primary bg-opacity-10">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title text-primary mb-0">📧 Regístrate gratis</h6>
+                            <span class="badge bg-success">RECOMENDADO</span>
+                        </div>
+                        <ul class="small mb-3">
+                            <li>15 prompts por semana (5 más)</li>
+                            <li>Guarda tus últimos 10 prompts</li>
+                            <li>Newsletter con tips exclusivos</li>
+                        </ul>
+                        <button class="btn btn-primary w-100" onclick="openRegisterModal(); bootstrap.Modal.getInstance(document.getElementById('upgrade-modal')).hide();">
+                            Registrarme gratis (30 segundos)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card border-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title text-warning mb-0">⭐ Acceso Premium</h6>
+                            <span class="badge bg-warning text-dark">$47 USD</span>
+                        </div>
+                        <ul class="small mb-3">
+                            <li>Prompts ilimitados de por vida</li>
+                            <li>Historial completo guardado</li>
+                            <li>Plantillas exclusivas</li>
+                            <li>30% OFF en curso completo de IA</li>
+                        </ul>
+                        <button class="btn btn-warning w-100" onclick="goToPremiumPurchase()">
+                            Upgrade a Premium
+                        </button>
+                        <p class="text-center small text-muted mt-2 mb-0">
+                            Pago único • Garantía 30 días
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Registro -->
+<div class="modal fade" id="register-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">🎉 Regístrate gratis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted text-center mb-4">Obtén 15 prompts/semana + guarda tu historial</p>
+                
+                <form id="register-form" onsubmit="handleRegister(event)">
+                    <div id="register-error" class="alert alert-danger" style="display: none;"></div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="register-name" placeholder="Tu nombre" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="register-email" placeholder="tu@email.com" required>
+                    </div>
+
+                    <div class="alert alert-info small">
+                        <strong>✨ Con tu registro gratis:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>15 prompts por semana (en vez de 10)</li>
+                            <li>Historial de últimos 10 prompts</li>
+                            <li>Newsletter semanal con tips</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" id="register-submit" class="btn btn-primary w-100">
+                        Registrarme gratis
+                    </button>
+
+                    <p class="text-center small text-muted mt-3 mb-0">
+                        No spam. No tarjeta. Cancela cuando quieras.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Activación Premium -->
+<div class="modal fade" id="activate-modal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">⭐ Activar Premium</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="activate-success" style="display: none;" class="text-center py-4">
+                    <span style="font-size: 64px;">🎉</span>
+                    <h4 class="text-success mt-3">¡Premium Activado!</h4>
+                    <p class="text-muted">Recargando tu cuenta...</p>
+                </div>
+
+                <div id="activate-form-content">
+                    <p class="text-muted text-center mb-4">Ingresa el código que recibiste al comprar</p>
+                    
+                    <form id="activate-form" onsubmit="handleActivatePremium(event)">
+                        <div id="activate-error" class="alert alert-danger" style="display: none;"></div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Código de activación</label>
+                            <input 
+                                type="text" 
+                                class="form-control form-control-lg text-center" 
+                                id="premium-code" 
+                                placeholder="PL-XXXXXXXX"
+                                maxlength="12"
+                                style="font-family: monospace; letter-spacing: 2px;"
+                                required
+                            >
+                            <small class="form-text text-muted text-center d-block mt-1">
+                                Formato: PL-ABC12345
+                            </small>
+                        </div>
+
+                        <button type="submit" id="activate-submit" class="btn btn-warning w-100">
+                            Activar Premium
+                        </button>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="small text-muted mb-2">¿No tienes un código?</p>
+                    <button class="btn btn-outline-secondary w-100" onclick="goToPremiumPurchase()">
+                        Comprar Premium ($47)
+                    </button>
+
+                    <p class="text-center small text-muted mt-3 mb-0">
+                        ¿Problemas? <a href="mailto:celeste@tudominio.com">Contáctanos</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- Sistema de límites freemium -->
     <script src="js/limits.js"></script>
     <script src="js/modals.js"></script>
