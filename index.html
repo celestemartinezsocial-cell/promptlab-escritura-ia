@@ -545,69 +545,134 @@
                         </div>
                     )}
 
-                    {step === 2 && (
-                        <div className="space-y-6">
-                            <div className="alert alert-blue">
-                                <strong>🎯 Paso 3: Mejora tu Prompt</strong><br/><br/>
-                                👇 Revisa tu plan y genera la versión mejorada.
+    {step === 2 && (
+    <div className="space-y-6">
+        <div className="alert alert-blue">
+            <strong>🎯 Paso 3: Mejora tu Prompt</strong><br/><br/>
+            👇 Revisa tu plan y ajusta los campos necesarios para mejorar tu resultado.
+        </div>
+
+        <div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
+            <label className="label">📋 Tu Plan de Mejora:</label>
+            <p style={{fontSize: '14px', marginBottom: '12px', fontStyle: 'italic'}}>"{ref.change || 'No hay cambios aún'}"</p>
+        </div>
+
+        <div style={{background: '#F0F9FF', padding: '20px', borderRadius: '8px', border: '2px solid #BFDBFE'}}>
+            <h3 style={{fontSize: '16px', fontWeight: 700, marginBottom: '16px', color: '#1E40AF'}}>
+                ✏️ Ajusta tu Prompt
+            </h3>
+
+            <div className="space-y-4">
+                <div className="grid-2">
+                    <div>
+                        <label className="label">Propósito</label>
+                        <select value={data.purpose} onChange={(e) => update('purpose', e.target.value)} className="input-field">
+                            <option value="">Seleccionar...</option>
+                            {purposes.map(p => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="label">Tono</label>
+                        <select value={data.tone} onChange={(e) => update('tone', e.target.value)} className="input-field">
+                            <option value="">Seleccionar...</option>
+                            {tones.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="grid-2">
+                    <div>
+                        <label className="label">Audiencia</label>
+                        <input type="text" value={data.audience} onChange={(e) => update('audience', e.target.value)}
+                            className="input-field" />
+                    </div>
+                    <div>
+                        <label className="label">Extensión</label>
+                        <select value={data.length} onChange={(e) => update('length', e.target.value)} className="input-field">
+                            <option value="">Seleccionar extensión...</option>
+                            <option value="~100 palabras">Muy corto (~100 palabras)</option>
+                            <option value="~250 palabras">Corto (~250 palabras)</option>
+                            <option value="~500 palabras">Medio (~500 palabras)</option>
+                            <option value="~1000 palabras">Largo (~1000 palabras)</option>
+                            <option value="~2000 palabras">Muy largo (~2000 palabras)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label className="label">Palabras clave</label>
+                    <input 
+                        type="text"
+                        value={data.keywords || ''} 
+                        onChange={(e) => update('keywords', e.target.value)} 
+                        className="input-field"
+                        placeholder="Ej: innovación, sostenibilidad, ROI"
+                    />
+                </div>
+
+                <div>
+                    <label className="label">Instrucciones adicionales</label>
+                    <textarea 
+                        value={data.additionalInstructions || ''} 
+                        onChange={(e) => update('additionalInstructions', e.target.value)} 
+                        className="textarea-field" 
+                        placeholder="Ej: Formato con bullets, incluir 3 CTAs, evitar clichés..."
+                        rows="3"
+                    />
+                </div>
+            </div>
+        </div>
+
+        <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
+            <label className="label">Vista Previa del Prompt Mejorado:</label>
+            <div className="response-box" style={{maxHeight: '200px'}}>{buildPrompt()}</div>
+        </div>
+
+        <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
+            {loading ? '⟳ Generando...' : '✨ Generar Versión Mejorada'}
+        </button>
+
+        {resp2 && (
+            <>
+                <div>
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '16px'}}>
+                        <h3 style={{fontSize: '18px', fontWeight: 600}}>Compara tus resultados</h3>
+                    </div>
+                    <div className="grid-2">
+                        <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                                <label className="label">📄 Primera versión</label>
+                                <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
+                                    📋 Copiar
+                                </button>
                             </div>
-
-                            <div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
-                                <label className="label">📋 Tu Plan de Mejora:</label>
-                                <p style={{fontSize: '14px', marginBottom: '12px', fontStyle: 'italic'}}>"{ref.change || 'No hay cambios aún'}"</p>
+                            <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp1}</div>
+                            <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
+                                <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
+                                    📊 {resp1.split(' ').length} palabras
+                                </p>
                             </div>
-
-                            <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
-                                <label className="label">Tu Prompt Actual:</label>
-                                <div className="response-box" style={{maxHeight: '200px'}}>{buildPrompt()}</div>
-                            </div>
-
-                            <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
-                                {loading ? '⟳ Generando...' : '✨ Generar Versión Mejorada'}
-                            </button>
-
-                            {resp2 && (
-                                <>
-                                    <div>
-                                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '16px'}}>
-                                            <h3 style={{fontSize: '18px', fontWeight: 600}}>Compara tus resultados</h3>
-                                        </div>
-                                        <div className="grid-2">
-                                            <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
-                                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
-                                                    <label className="label">📄 Primera versión</label>
-                                                    <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
-                                                        📋 Copiar
-                                                    </button>
-                                                </div>
-                                                <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp1}</div>
-                                                <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
-                                                    <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
-                                                        📊 {resp1.split(' ').length} palabras
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
-                                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
-                                                    <label className="label">✨ Versión mejorada</label>
-                                                    <button onClick={() => copy(resp2)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
-                                                        📋 Copiar
-                                                    </button>
-                                                </div>
-                                                <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp2}</div>
-                                                <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
-                                                    <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
-                                                        📊 {resp2.split(' ').length} palabras
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
                         </div>
-                    )}
-
+                        <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                                <label className="label">✨ Versión mejorada</label>
+                                <button onClick={() => copy(resp2)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
+                                    📋 Copiar
+                                </button>
+                            </div>
+                            <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp2}</div>
+                            <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
+                                <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
+                                    📊 {resp2.split(' ').length} palabras
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </>
+        )}
+    </div>
+)}
                     {step === 3 && (
                         <div className="space-y-6">
                             <div className="alert alert-orange">
