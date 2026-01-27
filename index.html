@@ -301,390 +301,356 @@
                 </div>
 
                 <div className="card">
-                    {step === 0 && (
-                        <div className="space-y-6">
-                            <div className="alert alert-blue">
-                                <strong>🎯 Paso 1: Crea tu Prompt</strong><br/><br/>
-                                Un buen prompt es específico y claro. Completa estos campos para que la IA entienda exactamente qué necesitas. Mientras más detalles des, mejores serán los resultados.
-                            </div>
-                         <div>
-                                <label className="label">1. Tipo de Contenido *</label>
-                                <div className="grid-4">
-                                    {types.map(t => (
-                                        <button key={t.id} onClick={() => update('contentType', t.id)}
-                                            className={`content-btn ${data.contentType === t.id ? 'active' : ''}`}>
-                                            <div style={{fontSize: '24px', marginBottom: '4px'}}>{t.emoji}</div>
-                                            <div style={{fontSize: '12px', fontWeight: 500}}>{t.label}</div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
+    {step === 0 && (
+        <div className="space-y-6">
+            <div className="alert alert-blue">
+                <strong>🎯 Paso 1: Crea tu Prompt</strong><br/><br/>
+                Un buen prompt es específico y claro. Completa estos campos para que la IA entienda exactamente qué necesitas. Mientras más detalles des, mejores serán los resultados.
+            </div>
 
-                            {data.contentType === 'documentation' && (
-                                <div>
-                                    <label className="label">Tipo de Documento *</label>
-                                    <select value={data.docSubtype} onChange={(e) => update('docSubtype', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar tipo de documento...</option>
-                                        {docSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
-                                    </select>
-                                </div>
-                            )}
+            <div>
+                <label className="label">1. Tipo de Contenido *</label>
+                <div className="grid-4">
+                    {types.map(t => (
+                        <button key={t.id} onClick={() => update('contentType', t.id)}
+                            className={`content-btn ${data.contentType === t.id ? 'active' : ''}`}>
+                            <div style={{fontSize: '24px', marginBottom: '4px'}}>{t.emoji}</div>
+                            <div style={{fontSize: '12px', fontWeight: 500}}>{t.label}</div>
+                        </button>
+                    ))}
+                </div>
+            </div>
 
-                            {data.contentType === 'presentation' && (
-                                <div>
-                                    <label className="label">Tipo de Presentación *</label>
-                                    <select value={data.presentationSubtype} onChange={(e) => update('presentationSubtype', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar tipo de presentación...</option>
-                                        {presentationSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
-                                    </select>
-                                </div>
-                            )}
-
-                            {data.contentType === 'proposal' && (
-                                <div>
-                                    <label className="label">Tipo de Propuesta *</label>
-                                    <select value={data.proposalSubtype} onChange={(e) => update('proposalSubtype', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar tipo de propuesta...</option>
-                                        {proposalSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
-                                    </select>
-                                </div>
-                            )}
-
-                            {data.contentType === 'social' && (
-                                <div>
-                                    <label className="label">Red Social *</label>
-                                    <select value={data.socialSubtype} onChange={(e) => update('socialSubtype', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar red social...</option>
-                                        {Object.keys(socialSubtypes).map(sn => <option key={sn} value={sn}>{sn}</option>)}
-                                    </select>
-                                    {data.socialSubtype && (
-                                        <div style={{background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '8px', padding: '12px', marginTop: '8px'}}>
-                                            <p style={{fontSize: '12px', color: '#92400E'}}>
-                                                <strong>📌 Best Practice:</strong> {socialSubtypes[data.socialSubtype]}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            <div>
-                                <label className="label">2. ¿Sobre qué estás escribiendo? *</label>
-                                <input type="text" value={data.topic} onChange={(e) => update('topic', e.target.value)}
-                                    placeholder="Ej: El impacto del trabajo remoto en equipos de desarrollo"
-                                    className="input-field" />
-                                <p className="helper-text">Mientras más específico, mejores resultados</p>
-                            </div>
-
-                            <div className="grid-2">
-                                <div>
-                                    <label className="label">3. Propósito*</label>
-                                    <select value={data.purpose} onChange={(e) => update('purpose', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar...</option>
-                                        {purposes.map(p => <option key={p} value={p}>{p}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="label">4. Tono*</label>
-                                    <select value={data.tone} onChange={(e) => update('tone', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar...</option>
-                                        {tones.map(t => <option key={t} value={t}>{t}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="grid-2">
-                                <div>
-                                    <label className="label">5. Audiencia*</label>
-                                    <input type="text" value={data.audience} onChange={(e) => update('audience', e.target.value)}
-                                        placeholder="Ej: Profesionales de 30+ años" className="input-field" />
-                                </div>
-                                <div>
-                                    <label className="label">6. Extensión</label>
-                                    <select value={data.length} onChange={(e) => update('length', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar extensión...</option>
-                                        <option value="~100 palabras">Muy corto (~100 palabras)</option>
-                                        <option value="~250 palabras">Corto (~250 palabras)</option>
-                                        <option value="~500 palabras">Medio (~500 palabras)</option>
-                                        <option value="~1000 palabras">Largo (~1000 palabras)</option>
-                                        <option value="~2000 palabras">Muy largo (~2000 palabras)</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div style={{borderTop: '2px solid #FF7A00', paddingTop: '24px'}}>
-                                <h3 style={{fontSize: '18px', fontWeight: 700, marginBottom: '16px'}}>
-                                    📋 Detalles Críticos
-                                </h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="label">7. Palabras clave (opcional)</label>
-                                        <input 
-                                            type="text"
-                                            value={data.keywords || ''}     
-                                            onChange={(e) => update('keywords', e.target.value)} 
-                                            className="input-field"
-                                            placeholder="Ej: innovación, sostenibilidad, ROI, transformación digital"
-                                        />
-                                        <p className="helper-text">Palabras que DEBEN aparecer en el contenido</p>
-                                        </div>
-
-                                        <div>
-                                        <label className="label">8. Instrucciones adicionales (opcional)</label>
-                                        <textarea 
-                                            value={data.additionalInstructions || ''} 
-                                            onChange={(e) => update('additionalInstructions', e.target.value)} 
-                                            className="textarea-field" 
-                                            placeholder="Ej: Formato con bullets, estilo como NYTimes, incluir 3 CTAs, usar datos del Q4, evitar jerga técnica..."
-                                        />
-                                        <p className="helper-text">Detalles específicos únicos de esta tarea</p>
-                                    </div>
-                                    </div>
-
-                            <div style={{background: '#F9FAFB', border: '1px solid #E8E9E9', borderRadius: '8px', padding: '16px'}}>
-                                <label className="label">Vista Previa:</label>
-                                <div className="response-box" style={{maxHeight: '150px'}}>
-                                    {buildPrompt() || 'Completa los campos...'}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {step === 1 && (
-                <div className="space-y-6">
-                    <div className="alert alert-blue">
-                    <strong>🎯 Paso 2: Genera y Analiza</strong><br/><br/>
-                    👇 Genera tu contenido y analiza qué funcionó y qué mejorar.
-                        </div>
-                        <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
-            <label className="label">Tu Prompt:</label>
-            <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
-        </div>
-                            <button onClick={() => generate(false)} 
-                                disabled={!data.contentType || !data.topic || !data.purpose || !data.audience || !data.tone || loading}
-                                className="btn-primary"
-                            >
-                                {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
-                            </button>
-
-                            {resp1 && (
-                                <>
-                                    <div style={{background: '#EFF6FF', padding: '16px', borderRadius: '8px', border: '1px solid #BFDBFE'}}>
-                                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
-                                            <label className="label">Contenido Generado:</label>
-                                            <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '8px 16px', fontSize: '14px'}}>
-                                                📋 Copiar
-                                            </button>
-                                        </div>
-                                        <div className="response-box">{resp1}</div>
-                                    </div>
-
-                                    <div className="alert alert-orange">
-                                        <strong>🔍 Analiza los resultados:</strong>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="label">✅ ¿Qué funcionó bien?</label>
-                                            <textarea value={ref.worked} onChange={(e) => setRef({...ref, worked: e.target.value})}
-                                                placeholder="Ej: El tono fue perfecto..." className="textarea-field"></textarea>
-                                        </div>
-                                        <div>
-                                            <label className="label">❌ ¿Qué no funcionó?</label>
-                                            <textarea value={ref.notWorked} onChange={(e) => setRef({...ref, notWorked: e.target.value})}
-                                                placeholder="Ej: Muy formal..." className="textarea-field"></textarea>
-                                        </div>
-                                        <div>
-                                            <label className="label">🔧 ¿Qué cambiarás?</label>
-                                            <textarea value={ref.change} onChange={(e) => setRef({...ref, change: e.target.value})}
-                                                placeholder="Ej: Agregar ejemplos..." className="textarea-field"></textarea>
-                                        </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    )}
-{step === 2 && (
-    <div className="space-y-6">
-        <div className="alert alert-blue">
-            <strong>🎯 Paso 3: Mejora tu Prompt</strong><br/><br/>
-            👇 Revisa tu plan y genera la versión mejorada.
-        </div>
-
-        <div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
-            <label className="label">📋 Tu Plan de Mejora:</label>
-            <p style={{fontSize: '14px', marginBottom: '12px', fontStyle: 'italic'}}>"{ref.change || 'No hay cambios aún'}"</p>
-        </div>
-
-        <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
-            <label className="label">Tu Prompt Actual:</label>
-            <div className="response-box" style={{maxHeight: '200px'}}>{buildPrompt()}</div>
-        </div>
-
-        <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
-            {loading ? '⟳ Generando...' : '✨ Generar Versión Mejorada'}
-        </button>
-
-        {resp2 && (
-            <>
+            {data.contentType === 'documentation' && (
                 <div>
-                    <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '16px'}}>
-                        <h3 style={{fontSize: '18px', fontWeight: 600}}>Compara tus resultados</h3>
-                    </div>
-                    <div className="grid-2">
-                        <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
-                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
-                                <label className="label">📄 Primera versión</label>
-                                <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
-                                    📋 Copiar
-                                </button>
-                            </div>
-                            <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp1}</div>
-                            <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
-                                <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
-                                    📊 {resp1.split(' ').length} palabras
-                                </p>
-                            </div>
-                        </div>
-                        <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
-                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
-                                <label className="label">✨ Versión mejorada</label>
-                                <button onClick={() => copy(resp2)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
-                                    📋 Copiar
-                                </button>
-                            </div>
-                            <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp2}</div>
-                            <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
-                                <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
-                                    📊 {resp2.split(' ').length} palabras
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                    <label className="label">Tipo de Documento *</label>
+                    <select value={data.docSubtype} onChange={(e) => update('docSubtype', e.target.value)} className="input-field">
+                        <option value="">Seleccionar tipo de documento...</option>
+                        {docSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
+                    </select>
                 </div>
-            </>
-        )}
-    </div>
-)}
+            )}
 
-                    {step === 3 && (
-                        <div className="space-y-6">
-                            <div className="alert alert-orange">
-                                🎯 Prueba tu prompt mejorado y compara!
-                            </div>
+            {data.contentType === 'presentation' && (
+                <div>
+                    <label className="label">Tipo de Presentación *</label>
+                    <select value={data.presentationSubtype} onChange={(e) => update('presentationSubtype', e.target.value)} className="input-field">
+                        <option value="">Seleccionar tipo de presentación...</option>
+                        {presentationSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
+                    </select>
+                </div>
+            )}
 
-                            <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
-                                <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
-                            </div>
+            {data.contentType === 'proposal' && (
+                <div>
+                    <label className="label">Tipo de Propuesta *</label>
+                    <select value={data.proposalSubtype} onChange={(e) => update('proposalSubtype', e.target.value)} className="input-field">
+                        <option value="">Seleccionar tipo de propuesta...</option>
+                        {proposalSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
+                    </select>
+                </div>
+            )}
 
-                            <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
-                                {loading ? '⟳ Generando...' : '✨ Generar Mejorado'}
-                            </button>
-
-                            {resp2 && (
-                                <>
-                                    <div>
-    <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '16px'}}>
-        <h3 style={{fontSize: '18px', fontWeight: 600}}>Compara tus resultados</h3>
-    </div>
-    <div className="grid-2">
-        <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
-                <label className="label">📄 Primera versión</label>
-                <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
-                    📋 Copiar
-                </button>
-            </div>
-            <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp1}</div>
-            <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
-                <p style={{fontSize: '12px', color: '#1E40AF', margin: 0}}>
-                    📊 {resp1.split(' ').length} palabras
-                </p>
-            </div>
-        </div>
-        <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
-                <label className="label">✨ Versión mejorada</label>
-                <button onClick={() => copy(resp2)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
-                    📋 Copiar
-                </button>
-            </div>
-            <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp2}</div>
-            <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
-            <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
-                    📊 {resp2.split(' ').length} palabras
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-
-                                    <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px', border: '1px solid #E9D5FF'}}>
-                                        <h3 style={{fontWeight: 700, color: '#6B21A8', marginBottom: '16px'}}>📝 Reflexión Final</h3>
-                                        
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label className="label">¿Cuál logra mejor tu propósito?</label>
-                                                <textarea value={finalRef.better} onChange={(e) => setFinalRef({...finalRef, better: e.target.value})}
-                                                    className="textarea-field"></textarea>
-                                            </div>
-                                            <div>
-                                                <label className="label">¿Cuál tiene el tono correcto?</label>
-                                                <textarea value={finalRef.tone} onChange={(e) => setFinalRef({...finalRef, tone: e.target.value})}
-                                                    className="textarea-field"></textarea>
-                                            </div>
-                                            <div>
-                                                <label className="label">¿Qué cambio hizo la mayor mejora?</label>
-                                                <textarea value={finalRef.bigChange} onChange={(e) => setFinalRef({...finalRef, bigChange: e.target.value})}
-                                                    className="textarea-field"></textarea>
-                                            </div>
-                                            <div>
-                                                <label className="label">¿Qué aprendiste?</label>
-                                                <textarea value={finalRef.learning} onChange={(e) => setFinalRef({...finalRef, learning: e.target.value})}
-                                                    className="textarea-field"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px'}}>
-                                        <h3 style={{fontWeight: 700, color: '#000000', marginBottom: '12px'}}>🎉 Puntos Clave</h3>
-                                        <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ Pequeños cambios = grandes mejoras</p>
-                                        <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ La especificidad es clave</p>
-                                        <p style={{fontSize: '14px', color: '#15803D', marginBottom: '16px'}}>✓ Los ejemplos son poderosos</p>
-                                        <div style={{display: 'flex', gap: '8px'}}>
-                                    <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
-                                    📄 Exportar TXT
-                                    </button>
-                                    <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
-                                    📘 Exportar Word
-                                    </button>
-                                </div>
-                                    </div>
-                                </>
-                            )}
+            {data.contentType === 'social' && (
+                <div>
+                    <label className="label">Red Social *</label>
+                    <select value={data.socialSubtype} onChange={(e) => update('socialSubtype', e.target.value)} className="input-field">
+                        <option value="">Seleccionar red social...</option>
+                        {Object.keys(socialSubtypes).map(sn => <option key={sn} value={sn}>{sn}</option>)}
+                    </select>
+                    {data.socialSubtype && (
+                        <div style={{background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: '8px', padding: '12px', marginTop: '8px'}}>
+                            <p style={{fontSize: '12px', color: '#92400E'}}>
+                                <strong>📌 Best Practice:</strong> {socialSubtypes[data.socialSubtype]}
+                            </p>
                         </div>
                     )}
+                </div>
+            )}
 
-                <div className="card">
-                    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="btn-secondary">
-                            ← Atrás
-                        </button>
-                        <p style={{fontSize: '14px', color: '#8A8B8C'}}>Paso {step + 1} de 4</p>
-                        <button onClick={() => setStep(Math.min(3, step + 1))} disabled={step === 3} className="btn-primary" style={{width: 'auto'}}>
-                            Siguiente →
-                        </button>
+            <div>
+                <label className="label">2. ¿Sobre qué estás escribiendo? *</label>
+                <input type="text" value={data.topic} onChange={(e) => update('topic', e.target.value)}
+                    placeholder="Ej: El impacto del trabajo remoto en equipos de desarrollo"
+                    className="input-field" />
+                <p className="helper-text">Mientras más específico, mejores resultados</p>
+            </div>
+
+            <div className="grid-2">
+                <div>
+                    <label className="label">3. Propósito *</label>
+                    <select value={data.purpose} onChange={(e) => update('purpose', e.target.value)} className="input-field">
+                        <option value="">Seleccionar...</option>
+                        {purposes.map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                </div>
+                <div>
+                    <label className="label">4. Tono *</label>
+                    <select value={data.tone} onChange={(e) => update('tone', e.target.value)} className="input-field">
+                        <option value="">Seleccionar...</option>
+                        {tones.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                </div>
+            </div>
+
+            <div className="grid-2">
+                <div>
+                    <label className="label">5. Audiencia *</label>
+                    <input type="text" value={data.audience} onChange={(e) => update('audience', e.target.value)}
+                        placeholder="Ej: Profesionales de 30+ años" className="input-field" />
+                </div>
+                <div>
+                    <label className="label">6. Extensión</label>
+                    <select value={data.length} onChange={(e) => update('length', e.target.value)} className="input-field">
+                        <option value="">Seleccionar extensión...</option>
+                        <option value="~100 palabras">Muy corto (~100 palabras)</option>
+                        <option value="~250 palabras">Corto (~250 palabras)</option>
+                        <option value="~500 palabras">Medio (~500 palabras)</option>
+                        <option value="~1000 palabras">Largo (~1000 palabras)</option>
+                        <option value="~2000 palabras">Muy largo (~2000 palabras)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style={{borderTop: '2px solid #FF7A00', paddingTop: '24px'}}>
+                <h3 style={{fontSize: '18px', fontWeight: 700, marginBottom: '16px'}}>
+                    📋 Detalles Críticos
+                </h3>
+                
+                <div className="space-y-4">
+                    <div>
+                        <label className="label">7. Palabras clave (opcional)</label>
+                        <input 
+                            type="text"
+                            value={data.keywords || ''} 
+                            onChange={(e) => update('keywords', e.target.value)} 
+                            className="input-field"
+                            placeholder="Ej: innovación, sostenibilidad, ROI, transformación digital"
+                        />
+                        <p className="helper-text">Palabras que DEBEN aparecer en el contenido</p>
+                    </div>
+
+                    <div>
+                        <label className="label">8. Instrucciones adicionales (opcional)</label>
+                        <textarea 
+                            value={data.additionalInstructions || ''} 
+                            onChange={(e) => update('additionalInstructions', e.target.value)} 
+                            className="textarea-field" 
+                            placeholder="Ej: Formato con bullets, estilo como NYTimes, incluir 3 CTAs, usar datos del Q4, evitar jerga técnica..."
+                            rows="2"
+                        />
+                        <p className="helper-text">Detalles específicos únicos de esta tarea</p>
                     </div>
                 </div>
+            </div>
 
-                <div style={{textAlign: 'center', padding: '20px', color: '#8A8B8C', fontSize: '14px'}}>
-                    <a href="https://www.celestemartinez.net" target="_blank" rel="noopener noreferrer" style={{color: '#FF7A00', textDecoration: 'none', fontWeight: 600}}>
-                        www.celestemartinez.net
-                    </a>
+            <div style={{background: '#F9FAFB', border: '1px solid #E8E9E9', borderRadius: '8px', padding: '16px'}}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
+                    <label className="label">Vista Previa:</label>
+                    {(() => {
+                        const quality = getPromptQuality();
+                        return (
+                            <span style={{fontSize: '14px', fontWeight: 600, color: quality.color}}>
+                                {quality.emoji} {quality.text}
+                            </span>
+                        );
+                    })()}
+                </div>
+                <div className="response-box" style={{maxHeight: '150px'}}>
+                    {buildPrompt() || 'Completa los campos...'}
                 </div>
             </div>
         </div>
-        );
-    };
-    
-    ReactDOM.render(<App />, document.getElementById('root'));
-</script>
+    )}
+
+    {step === 1 && (
+        <div className="space-y-6">
+            <div className="alert alert-blue">
+                <strong>🎯 Paso 2: Genera y Analiza</strong><br/><br/>
+                👇 Genera tu contenido y analiza qué funcionó y qué mejorar.
+            </div>
+
+            <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
+                <label className="label">Tu Prompt:</label>
+                <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
+            </div>
+
+            <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || !data.purpose || !data.audience || !data.tone || loading} className="btn-primary">
+                {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
+            </button>
+
+            {resp1 && (
+                <>
+                    <div style={{background: '#EFF6FF', padding: '16px', borderRadius: '8px', border: '1px solid #BFDBFE'}}>
+                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
+                            <label className="label">Contenido Generado:</label>
+                            <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '8px 16px', fontSize: '14px'}}>
+                                📋 Copiar
+                            </button>
+                        </div>
+                        <div className="response-box">{resp1}</div>
+                    </div>
+
+                    <div className="alert alert-orange">
+                        <strong>🔍 Analiza los resultados:</strong>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="label">✅ ¿Qué funcionó bien?</label>
+                            <textarea value={ref.worked} onChange={(e) => setRef({...ref, worked: e.target.value})}
+                                placeholder="Ej: El tono fue perfecto..." className="textarea-field"></textarea>
+                        </div>
+                        <div>
+                            <label className="label">❌ ¿Qué no funcionó?</label>
+                            <textarea value={ref.notWorked} onChange={(e) => setRef({...ref, notWorked: e.target.value})}
+                                placeholder="Ej: Muy formal..." className="textarea-field"></textarea>
+                        </div>
+                        <div>
+                            <label className="label">🔧 ¿Qué cambiarás?</label>
+                            <textarea value={ref.change} onChange={(e) => setRef({...ref, change: e.target.value})}
+                                placeholder="Ej: Agregar ejemplos..." className="textarea-field"></textarea>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    )}
+
+    {step === 2 && (
+        <div className="space-y-6">
+            <div className="alert alert-blue">
+                <strong>🎯 Paso 3: Mejora tu Prompt</strong><br/><br/>
+                👇 Revisa tu plan y genera la versión mejorada.
+            </div>
+
+            <div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
+                <label className="label">📋 Tu Plan de Mejora:</label>
+                <p style={{fontSize: '14px', marginBottom: '12px', fontStyle: 'italic'}}>"{ref.change || 'No hay cambios aún'}"</p>
+            </div>
+
+            <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
+                <label className="label">Tu Prompt Actual:</label>
+                <div className="response-box" style={{maxHeight: '200px'}}>{buildPrompt()}</div>
+            </div>
+
+            <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
+                {loading ? '⟳ Generando...' : '✨ Generar Versión Mejorada'}
+            </button>
+
+            {resp2 && (
+                <>
+                    <div>
+                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '16px'}}>
+                            <h3 style={{fontSize: '18px', fontWeight: 600}}>Compara tus resultados</h3>
+                        </div>
+                        <div className="grid-2">
+                            <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                                    <label className="label">📄 Primera versión</label>
+                                    <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
+                                        📋 Copiar
+                                    </button>
+                                </div>
+                                <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp1}</div>
+                                <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
+                                    <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
+                                        📊 {resp1.split(' ').length} palabras
+                                    </p>
+                                </div>
+                            </div>
+                            <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                                    <label className="label">✨ Versión mejorada</label>
+                                    <button onClick={() => copy(resp2)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
+                                        📋 Copiar
+                                    </button>
+                                </div>
+                                <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp2}</div>
+                                <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
+                                    <p style={{fontSize: '12px', color: '#374151', margin: 0}}>
+                                        📊 {resp2.split(' ').length} palabras
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    )}
+
+    {step === 3 && (
+        <div className="space-y-6">
+            <div className="alert alert-orange">
+                <strong>🎯 Paso 4: Compara Resultados</strong><br/><br/>
+                Genera la versión mejorada y compárala con la primera.
+            </div>
+
+            <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
+                <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
+            </div>
+
+            <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
+                {loading ? '⟳ Generando...' : '✨ Generar Mejorado'}
+            </button>
+
+            {resp2 && (
+                <>
+                    <div className="grid-2">
+                        <div style={{background: '#EFF6FF', padding: '16px', borderRadius: '8px'}}>
+                            <label className="label">Primera:</label>
+                            <div className="response-box" style={{fontSize: '12px', maxHeight: '200px'}}>{resp1}</div>
+                        </div>
+                        <div style={{background: '#F0FDF4', padding: '16px', borderRadius: '8px'}}>
+                            <label className="label">Mejorada:</label>
+                            <div className="response-box" style={{fontSize: '12px', maxHeight: '200px'}}>{resp2}</div>
+                        </div>
+                    </div>
+
+                    <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px', border: '1px solid #9CA3AF'}}>
+                        <h3 style={{fontWeight: 700, color: '#374151', marginBottom: '16px'}}>📝 Reflexión Final</h3>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="label">¿Cuál logra mejor tu propósito?</label>
+                                <textarea value={finalRef.better} onChange={(e) => setFinalRef({...finalRef, better: e.target.value})}
+                                    className="textarea-field"></textarea>
+                            </div>
+                            <div>
+                                <label className="label">¿Cuál tiene el tono correcto?</label>
+                                <textarea value={finalRef.tone} onChange={(e) => setFinalRef({...finalRef, tone: e.target.value})}
+                                    className="textarea-field"></textarea>
+                            </div>
+                            <div>
+                                <label className="label">¿Qué cambio hizo la mayor mejora?</label>
+                                <textarea value={finalRef.bigChange} onChange={(e) => setFinalRef({...finalRef, bigChange: e.target.value})}
+                                    className="textarea-field"></textarea>
+                            </div>
+                            <div>
+                                <label className="label">¿Qué aprendiste?</label>
+                                <textarea value={finalRef.learning} onChange={(e) => setFinalRef({...finalRef, learning: e.target.value})}
+                                    className="textarea-field"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px'}}>
+                        <h3 style={{fontWeight: 700, color: '#000000', marginBottom: '12px'}}>🎉 Puntos Clave</h3>
+                        <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ Pequeños cambios = grandes mejoras</p>
+                        <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ La especificidad es clave</p>
+                        <p style={{fontSize: '14px', color: '#000000', marginBottom: '16px'}}>✓ Los ejemplos son poderosos</p>
+                        <div style={{display: 'flex', gap: '8px'}}>
+                            <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
+                                📄 Exportar TXT
+                            </button>
+                            <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
+                                📘 Exportar Word
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
+    )}
+</div>
