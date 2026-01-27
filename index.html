@@ -544,8 +544,7 @@
                             )}
                         </div>
                     )}
-
-    {step === 2 && (
+{step === 2 && (
     <div className="space-y-6">
         <div className="alert alert-blue">
             <strong>🎯 Paso 3: Mejora tu Prompt</strong><br/><br/>
@@ -626,6 +625,18 @@
         <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
             <label className="label">Vista Previa del Prompt Mejorado:</label>
             <div className="response-box" style={{maxHeight: '200px'}}>{buildPrompt()}</div>
+        </div>
+
+        <div style={{background: '#FFF3CD', padding: '16px', borderRadius: '8px', border: '1px solid #FFC107'}}>
+            <label className="label" style={{color: '#856404', marginBottom: '8px'}}>📝 Recordatorio de tu plan:</label>
+            <p style={{fontSize: '14px', color: '#856404', fontStyle: 'italic', marginBottom: '12px'}}>
+                "{ref.change || 'Sin cambios específicos registrados'}"
+            </p>
+            <div style={{borderTop: '1px solid #FFC107', paddingTop: '12px', marginTop: '8px'}}>
+                <p style={{fontSize: '13px', color: '#856404', margin: 0}}>
+                    💡 <strong>Importante:</strong> La IA generará contenido completamente nuevo basado en tu prompt mejorado. Incluso los campos que no modificaste pueden producir texto diferente, ya que la IA crea contenido único en cada generación.
+                </p>
+            </div>
         </div>
 
         <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
