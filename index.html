@@ -452,16 +452,15 @@
                     )}
 
                     {step === 1 && (
-                        <div className="alert alert-blue">
-                            <div className="space-y-6">
-                           ¡Listo! Genera contenido y analiza los resultados.
+                <div className="space-y-6">
+                    <div className="alert alert-blue">
+                    <strong>🎯 Paso 2: Genera y Analiza</strong><br/><br/>
+                    👇 Genera tu contenido y analiza qué funcionó y qué mejorar.
                         </div>
-
-                            <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
-                                <label className="label">Tu Prompt:</label>
-                                <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
-                            </div>
-
+                        <div style={{background: '#F9FAFB', padding: '16px', borderRadius: '8px'}}>
+            <label className="label">Tu Prompt:</label>
+            <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
+        </div>
                             <button onClick={() => generate(false)} 
                                 disabled={!data.contentType || !data.topic || !data.purpose || !data.audience || !data.tone || loading}
                                 className="btn-primary"
