@@ -305,6 +305,20 @@ INSTRUCCIONES CRÍTICAS:
         <head><meta charset='utf-8'><title>PromptLab Export</title></head>
         <body>
             <h1>PromptLab - Proyecto</h1>
+            <!-- Indicador de uso -->
+<div id="usage-indicator" class="alert alert-info" style="display: none; margin: 20px 0;">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+            <span id="usage-icon" style="font-size: 24px;">✨</span>
+            <strong id="usage-text" class="ms-2">0 de 10 prompts usados esta semana</strong>
+            <br>
+            <small id="remaining-text" class="text-muted ms-5"></small>
+        </div>
+    </div>
+    <div class="progress" style="height: 6px;">
+        <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+    </div>
+</div>
             <h2>Prompt Inicial</h2>
             <p>${buildPrompt().replace(/\n/g, '<br>')}</p>
             <h2>Primera Versión</h2>
