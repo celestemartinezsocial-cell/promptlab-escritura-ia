@@ -1,4 +1,53 @@
-<script type="text/babel">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptLab - Escritura con IA</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background: linear-gradient(to bottom right, #FFF5EE, #F5F5F5); min-height: 100vh; }
+        .container { max-width: 1024px; margin: 0 auto; padding: 24px; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); padding: 32px; margin-bottom: 24px; }
+        .logo-container { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+        .logo { height: 120px; width: auto; }
+        .btn-primary { background: #FF7A00; color: white; padding: 16px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; width: 100%; font-size: 16px; }
+        .btn-primary:hover:not(:disabled) { opacity: 0.9; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: #E8E9E9; color: #4A4A4A; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        .input-field, .textarea-field, select { width: 100%; padding: 12px; border: 2px solid #E8E9E9; border-radius: 8px; font-size: 16px; font-family: 'Montserrat', sans-serif; }
+        .input-field:focus, .textarea-field:focus, select:focus { outline: none; border-color: #FF7A00; }
+        .textarea-field { min-height: 96px; resize: vertical; }
+        .label { display: block; font-weight: 600; font-size: 16px; color: #374151; margin-bottom: 8px; }
+        .helper-text { font-size: 14px; color: #8A8B8C; margin-top: 4px; }
+        .content-btn { padding: 12px; border: 2px solid #E8E9E9; border-radius: 8px; background: white; cursor: pointer; text-align: center; }
+        .content-btn.active { border-color: #FF7A00; background: #FFF5EE; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .space-y-4 > * + * { margin-top: 16px; }
+        .space-y-6 > * + * { margin-top: 24px; }
+        .alert { padding: 16px; border-left: 4px solid; border-radius: 8px; font-size: 16px; margin-bottom: 16px; }
+        .alert-blue { background: #F3F4F6; border-color: #6B7280; color: #000000; }
+        .alert-green { background: #F0FDF4; border-color: #22C55E; color: #166534; }
+        .alert-orange { background: #FED7AA; border-color: #F59E0B; color: #000000; }
+        .alert-purple { background: #FAF5FF; border-color: #A855F7; color: #6B21A8; }
+        .alert-pink { background: #FCE7F3; border-color: #EC4899; color: #831843; }
+        .response-box { background: white; border: 1px solid #E8E9E9; border-radius: 8px; padding: 16px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; font-size: 16px; }
+        .step-indicator { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .progress-line { flex: 1; height: 4px; margin: 0 8px; }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
     const { useState } = React;
 
     const App = () => {
@@ -656,4 +705,6 @@
     };
 
     ReactDOM.render(<App />, document.getElementById('root'));
-</script>
+    </script>
+</body>
+</html>
