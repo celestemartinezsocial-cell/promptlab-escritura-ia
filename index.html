@@ -415,29 +415,9 @@
                                 <h3 style={{fontSize: '18px', fontWeight: 700, marginBottom: '16px'}}>
                                     📋 Detalles Críticos
                                 </h3>
-                                
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="label">7. Formato/Estructura</label>
-                                        <textarea value={data.format} onChange={(e) => update('format', e.target.value)}
-                                            placeholder="Ej: Comenzar con gancho, 3 secciones, viñetas"
-                                            className="textarea-field"></textarea>
-                                    </div>
-
-                                    <div>
-                                        <label className="label">8. Ejemplos de Estilo</label>
-                                        <textarea value={data.examples} onChange={(e) => update('examples', e.target.value)}
-                                            placeholder="Ej: Escribe como Harvard Business Review"
-                                            className="textarea-field"></textarea>
-                                    </div>
-
-                                    <div>
-                                        <label className="label">9. Requisitos Especiales</label>
-                                        <textarea value={data.constraints} onChange={(e) => update('constraints', e.target.value)}
-                                            placeholder="Ej: Incluir 2-3 estadísticas, evitar jerga"
-                                            className="textarea-field"></textarea>
-                                        <div>
-                                        <label className="label">10. Palabras clave (opcional)</label>
+                                        <label className="label">7. Palabras clave (opcional)</label>
                                         <input 
                                             type="text"
                                             value={data.keywords || ''}     
@@ -449,13 +429,12 @@
                                         </div>
 
                                         <div>
-                                        <label className="label">11. Instrucciones adicionales (opcional)</label>
+                                        <label className="label">8. Instrucciones adicionales (opcional)</label>
                                         <textarea 
                                             value={data.additionalInstructions || ''} 
                                             onChange={(e) => update('additionalInstructions', e.target.value)} 
                                             className="textarea-field" 
-                                            placeholder="Ej: Incluye 3 CTAs, menciona nuestra promoción de enero, usa datos específicos..."
-                                            rows="2"
+                                            placeholder="Ej: Formato con bullets, estilo como NYTimes, incluir 3 CTAs, usar datos del Q4, evitar jerga técnica..."
                                         />
                                         <p className="helper-text">Detalles específicos únicos de esta tarea</p>
                                     </div>
