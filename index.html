@@ -781,25 +781,59 @@ INSTRUCCIONES CRÍTICAS:
                                     </div>
 
                                     <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px'}}>
-                                        <h3 style={{fontWeight: 700, color: '#000000', marginBottom: '12px'}}>🎉 Puntos Clave</h3>
-                                        <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ Pequeños cambios = grandes mejoras</p>
-                                        <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ La especificidad es clave</p>
-                                        <p style={{fontSize: '14px', color: '#000000', marginBottom: '16px'}}>✓ Los ejemplos son poderosos</p>
-                                        <div style={{display: 'flex', gap: '8px'}}>
-                                            <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
-                                                📄 Exportar TXT
-                                            </button>
-                                            <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
-                                                📘 Exportar Word
-                                            </button>
-                                        </div>
-                                    </div>
-                                </>
+    <h3 style={{fontWeight: 700, color: '#000000', marginBottom: '12px'}}>🎉 Puntos Clave</h3>
+    <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ Pequeños cambios = grandes mejoras</p>
+    <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ La especificidad es clave</p>
+    <p style={{fontSize: '14px', color: '#000000', marginBottom: '16px'}}>✓ Los ejemplos son poderosos</p>
+    
+    <div style={{display: 'flex', gap: '8px', marginBottom: '12px'}}>
+        <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
+            📄 Exportar TXT
+        </button>
+        <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
+            📘 Exportar Word
+        </button>
+    </div>
+    
+    <button 
+        onClick={() => {
+            if (window.confirm('¿Estás seguro? Esto borrará todo tu progreso actual y volverás al inicio.')) {
+                setStep(0);
+                setData({
+                    contentType: '', 
+                    docSubtype: '',
+                    presentationSubtype: '',
+                    proposalSubtype: '',
+                    socialSubtype: '',
+                    topic: '', 
+                    purpose: '', 
+                    audience: '', 
+                    tone: '', 
+                    length: '',
+                    format: '', 
+                    examples: '', 
+                    constraints: '',
+                    keywords: '',
+                    additionalInstructions: ''
+                });
+                setResp1('');
+                setResp2('');
+                setRef({ worked: '', notWorked: '', change: '' });
+                setFinalRef({ better: '', tone: '', bigChange: '', learning: '' });
+            }
+        }}
+        className="btn-secondary"
+        style={{width: '100%'}}
+    >
+        🔄 Empezar Nuevo Proyecto
+    </button>
+</div>
+                                    </>
                             )}
                         </div>
                     )}
                 </div>
-                        
+
                 <div className="card">
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                         <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="btn-secondary">
