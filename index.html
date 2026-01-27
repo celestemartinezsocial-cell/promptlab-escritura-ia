@@ -653,4 +653,23 @@
             )}
         </div>
     )}
+    </div>                
+        <div className="card">
+    <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="btn-secondary">
+            ← Atrás
+        </button>
+        <p style={{fontSize: '14px', color: '#8A8B8C'}}>Paso {step + 1} de 4</p>
+        <button onClick={() => setStep(Math.min(3, step + 1))} disabled={step === 3} className="btn-primary" style={{width: 'auto'}}>
+            Siguiente →
+        </button>
+    </div>
+</div>
+
+<div style={{textAlign: 'center', padding: '20px', color: '#8A8B8C', fontSize: '14px'}}>
+    <a href="https://www.celestemartinez.net" target="_blank" rel="noopener noreferrer" style={{color: '#FF7A00', textDecoration: 'none', fontWeight: 600}}>
+        www.celestemartinez.net
+    </a>
+</div>
+                    
 
