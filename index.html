@@ -141,14 +141,6 @@
             });
         };
         // Auto-llenar instrucciones adicionales con el plan de mejora
-React.useEffect(() => {
-    if (step === 2 && ref.change && !data.additionalInstructions) {
-        setData(prev => ({
-            ...prev,
-            additionalInstructions: ref.change
-        }));
-    }
-}, [step]);
 
         const getPromptQuality = () => {
             const requiredFields = ['contentType', 'topic', 'purpose', 'audience', 'tone'];
@@ -939,9 +931,26 @@ const exportToWord = () => {
                             ← Atrás
                         </button>
                         <p style={{fontSize: '14px', color: '#8A8B8C'}}>Paso {step + 1} de 4</p>
-                        <button onClick={() => setStep(Math.min(3, step + 1))} disabled={step === 3} className="btn-primary" style={{width: 'auto'}}>
-                            Siguiente →
-                        </button>
+                       <button 
+    onClick={() => {
+        const nextStep = Math.min(3, step + 1);
+        
+        // Si va del Paso 2 al Paso 3 y tiene plan de mejora, auto-llenarlo
+        if (step === 1 && nextStep === 2 && ref.change && !data.additionalInstructions) {
+            setData(prev => ({
+                ...prev,
+                additionalInstructions: ref.change
+            }));
+        }
+        
+        setStep(nextStep);
+    }} 
+    disabled={step === 3} 
+    className="btn-primary" 
+    style={{width: 'auto'}}
+>
+    Siguiente →
+</button>
                     </div>
                 </div>
 
