@@ -931,7 +931,7 @@ const exportToWord = () => {
                             ← Atrás
                         </button>
                         <p style={{fontSize: '14px', color: '#8A8B8C'}}>Paso {step + 1} de 4</p>
-                       <button 
+                      <button 
     onClick={() => {
         const nextStep = Math.min(3, step + 1);
         
@@ -941,10 +941,13 @@ const exportToWord = () => {
                 ...prev,
                 additionalInstructions: ref.change
             }));
+            
+            // Pequeño delay para que el estado se actualice antes de cambiar de paso
+            setTimeout(() => setStep(nextStep), 50);
+        } else {
+            setStep(nextStep);
         }
-        
-        setStep(nextStep);
-    }} 
+    }}
     disabled={step === 3} 
     className="btn-primary" 
     style={{width: 'auto'}}
