@@ -931,23 +931,30 @@ const exportToWord = () => {
                             ← Atrás
                         </button>
                         <p style={{fontSize: '14px', color: '#8A8B8C'}}>Paso {step + 1} de 4</p>
-                      <button 
+                    <button 
     onClick={() => {
         const nextStep = Math.min(3, step + 1);
         
         // Si va del Paso 2 al Paso 3 y tiene plan de mejora, auto-llenarlo
-        if (step === 1 && nextStep === 2 && ref.change && !data.additionalInstructions) {
+        if (step === 1 && nextStep === 2 && ref.change) {
+            // Primero actualizamos las instrucciones
+            const newInstructions = data.additionalInstructions 
+                ? data.additionalInstructions + '\n\n' + ref.change 
+                : ref.change;
+            
             setData(prev => ({
                 ...prev,
-                additionalInstructions: ref.change
+                additionalInstructions: newInstructions
             }));
             
-            // Pequeño delay para que el estado se actualice antes de cambiar de paso
-            setTimeout(() => setStep(nextStep), 50);
+            // Esperamos que React actualice el estado antes de cambiar de paso
+            setTimeout(() => {
+                setStep(nextStep);
+            }, 200);
         } else {
             setStep(nextStep);
         }
-    }}
+    }} 
     disabled={step === 3} 
     className="btn-primary" 
     style={{width: 'auto'}}
