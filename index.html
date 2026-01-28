@@ -289,41 +289,98 @@ INSTRUCCIONES CRÍTICAS:
             alert('Copiado');
         };
 
-        const exportData = () => {
-            const content = `PROYECTO PROMPTLAB\n\nPROMPT INICIAL:\n${buildPrompt()}\n\nRESPUESTA 1:\n${resp1}\n\nREFLEXIÓN:\n${ref.worked}\n${ref.notWorked}\n${ref.change}\n\nPROMPT MEJORADO:\n${buildPrompt()}\n\nRESPUESTA 2:\n${resp2}\n\nAPRENDIZAJES:\n${finalRef.learning}`;
-            const blob = new Blob([content], { type: 'text/plain' });
+     const exportData = () => {
+    try {
+        const content = `PROYECTO PROMPTLAB\n\nPROMPT INICIAL:\n${buildPrompt()}\n\nRESPUESTA 1:\n${resp1}\n\nREFLEXIÓN:\n${ref.worked}\n${ref.notWorked}\n${ref.change}\n\nPROMPT MEJORADO:\n${buildPrompt()}\n\nRESPUESTA 2:\n${resp2}\n\nAPRENDIZAJES:\n${finalRef.learning}`;
+        
+        // Detectar si es móvil
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            // En móvil: abrir en nueva ventana para que puedan guardar
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const newWindow = window.open(url, '_blank');
+            
+            if (newWindow) {
+                alert('✓ Archivo abierto en nueva ventana. Usa "Guardar como..." o copia el contenido.');
+            } else {
+                // Si no se pudo abrir ventana, copiar al portapapeles
+                navigator.clipboard.writeText(content).then(() => {
+                    alert('✓ Contenido copiado al portapapeles. Pégalo en un archivo de texto.');
+                });
+            }
+        } else {
+            // En escritorio: descarga normal
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = 'promptlab-proyecto.txt';
+            document.body.appendChild(a);
             a.click();
-        };
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('✓ Archivo descargado. Revisa tu carpeta de Descargas.');
+        }
+    } catch (error) {
+        console.error('Error al exportar:', error);
+        alert('❌ Error al exportar. Intenta copiar el contenido manualmente.');
+    }
+};
 
-        const exportToWord = () => {
-            const content = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
-        <head><meta charset='utf-8'><title>PromptLab Export</title></head>
-        <body>
-            <h1>PromptLab - Proyecto</h1>
-            <h2>Prompt Inicial</h2>
-            <p>${buildPrompt().replace(/\n/g, '<br>')}</p>
-            <h2>Primera Versión</h2>
-            <p>${resp1.replace(/\n/g, '<br>')}</p>
-            ${resp2 ? `<h2>Versión Mejorada</h2><p>${resp2.replace(/\n/g, '<br>')}</p>` : ''}
-            <h2>Aprendizajes</h2>
-            <p>${finalRef.learning || 'Sin aprendizajes registrados'}</p>
-        </body>
-        </html>
-    `;
+const exportToWord = () => {
+    try {
+        const content = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
+<head>
+    <meta charset='utf-8'>
+    <title>PromptLab Export</title>
+</head>
+<body>
+    <h1>PromptLab - Proyecto</h1>
+    <h2>Prompt Inicial</h2>
+    <p>${buildPrompt().replace(/\n/g, '<br>')}</p>
+    <h2>Primera Versión</h2>
+    <p>${resp1.replace(/\n/g, '<br>')}</p>
+    ${resp2 ? `<h2>Versión Mejorada</h2><p>${resp2.replace(/\n/g, '<br>')}</p>` : ''}
+    <h2>Aprendizajes</h2>
+    <p>${finalRef.learning || 'Sin aprendizajes registrados'}</p>
+</body>
+</html>`;
+        
+        // Detectar si es móvil
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            // En móvil: abrir en nueva ventana
+            const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const newWindow = window.open(url, '_blank');
+            
+            if (newWindow) {
+                alert('✓ Documento abierto. Usa "Guardar como..." desde el menú del navegador.');
+            } else {
+                alert('❌ No se pudo abrir. Prueba con el botón "Exportar TXT" o desde una computadora.');
+            }
+        } else {
+            // En escritorio: descarga normal
             const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
             a.download = 'promptlab-proyecto.doc';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
-        };
-
+            alert('✓ Documento descargado. Revisa tu carpeta de Descargas.');
+        }
+    } catch (error) {
+        console.error('Error al exportar Word:', error);
+        alert('❌ Error al exportar. Intenta con el botón "Exportar TXT".');
+    }
+};
         return (
             <div className="container">
                 <div className="card">
@@ -794,7 +851,13 @@ INSTRUCCIONES CRÍTICAS:
             📘 Exportar Word
         </button>
     </div>
-    
+    <div style={{background: '#FFF9F0', padding: '12px', borderRadius: '8px', border: '1px solid #FFE4B5', marginBottom: '12px'}}>
+    <p style={{fontSize: '12px', color: '#8A8B8C', margin: 0, textAlign: 'center'}}>
+        📱 <strong>En móvil:</strong> El archivo se abrirá en una nueva ventana. Usa "Compartir" o "Guardar" desde el menú del navegador.
+        <br/>
+        💻 <strong>En computadora:</strong> El archivo se descargará automáticamente a tu carpeta de Descargas.
+    </p>
+</div>
     <button 
         onClick={() => {
             if (window.confirm('¿Estás seguro? Esto borrará todo tu progreso actual y volverás al inicio.')) {
