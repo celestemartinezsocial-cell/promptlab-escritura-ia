@@ -293,22 +293,38 @@ INSTRUCCIONES CRÍTICAS:
     try {
         const content = `PROYECTO PROMPTLAB\n\nPROMPT INICIAL:\n${buildPrompt()}\n\nRESPUESTA 1:\n${resp1}\n\nREFLEXIÓN:\n${ref.worked}\n${ref.notWorked}\n${ref.change}\n\nPROMPT MEJORADO:\n${buildPrompt()}\n\nRESPUESTA 2:\n${resp2}\n\nAPRENDIZAJES:\n${finalRef.learning}`;
         
-        // Detectar si es móvil
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        // Detectar iOS específicamente
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
         
-        if (isMobile) {
-            // En móvil: abrir en nueva ventana para que puedan guardar
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const newWindow = window.open(url, '_blank');
-            
-            if (newWindow) {
-                alert('✓ Archivo abierto en nueva ventana. Usa "Guardar como..." o copia el contenido.');
-            } else {
-                // Si no se pudo abrir ventana, copiar al portapapeles
+        if (isIOS || isAndroid) {
+            // En móvil: copiar al portapapeles
+            if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(content).then(() => {
-                    alert('✓ Contenido copiado al portapapeles. Pégalo en un archivo de texto.');
+                    alert('✓ Contenido copiado al portapapeles.\n\nAhora:\n1. Abre Notes, Gmail, o Google Drive\n2. Pega el contenido (mantén presionado y selecciona "Pegar")\n3. Guarda como archivo');
+                }).catch(() => {
+                    // Fallback: crear textarea para copiar manualmente
+                    const textarea = document.createElement('textarea');
+                    textarea.value = content;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('✓ Contenido copiado.\n\nAbre Notes o cualquier app de texto y pega (mantén presionado).');
                 });
+            } else {
+                // Método alternativo para navegadores antiguos
+                const textarea = document.createElement('textarea');
+                textarea.value = content;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✓ Contenido copiado.\n\nAbre Notes o cualquier app de texto y pega.');
             }
         } else {
             // En escritorio: descarga normal
@@ -325,12 +341,23 @@ INSTRUCCIONES CRÍTICAS:
         }
     } catch (error) {
         console.error('Error al exportar:', error);
-        alert('❌ Error al exportar. Intenta copiar el contenido manualmente.');
+        alert('❌ Error al exportar. Por favor, toma screenshot del contenido.');
     }
 };
 
 const exportToWord = () => {
     try {
+        // Detectar iOS específicamente
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        if (isIOS || isAndroid) {
+            // En móvil: mostrar mensaje e invitar a usar TXT
+            alert('📱 En móviles, es más fácil usar "Exportar TXT".\n\nOpciones:\n1. Usa el botón "Exportar TXT" (recomendado)\n2. O exporta desde una computadora para obtener formato Word');
+            return;
+        }
+        
+        // En escritorio: descarga Word normal
         const content = `
 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
 <head>
@@ -349,33 +376,16 @@ const exportToWord = () => {
 </body>
 </html>`;
         
-        // Detectar si es móvil
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        
-        if (isMobile) {
-            // En móvil: abrir en nueva ventana
-            const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
-            const url = URL.createObjectURL(blob);
-            const newWindow = window.open(url, '_blank');
-            
-            if (newWindow) {
-                alert('✓ Documento abierto. Usa "Guardar como..." desde el menú del navegador.');
-            } else {
-                alert('❌ No se pudo abrir. Prueba con el botón "Exportar TXT" o desde una computadora.');
-            }
-        } else {
-            // En escritorio: descarga normal
-            const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'promptlab-proyecto.doc';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            alert('✓ Documento descargado. Revisa tu carpeta de Descargas.');
-        }
+        const blob = new Blob(['\ufeff', content], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'promptlab-proyecto.doc';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        alert('✓ Documento descargado. Revisa tu carpeta de Descargas.');
     } catch (error) {
         console.error('Error al exportar Word:', error);
         alert('❌ Error al exportar. Intenta con el botón "Exportar TXT".');
@@ -851,11 +861,11 @@ const exportToWord = () => {
             📘 Exportar Word
         </button>
     </div>
-    <div style={{background: '#FFF9F0', padding: '12px', borderRadius: '8px', border: '1px solid #FFE4B5', marginBottom: '12px'}}>
+  <div style={{background: '#FFF9F0', padding: '12px', borderRadius: '8px', border: '1px solid #FFE4B5', marginBottom: '12px'}}>
     <p style={{fontSize: '12px', color: '#8A8B8C', margin: 0, textAlign: 'center'}}>
-        📱 <strong>En móvil:</strong> El archivo se abrirá en una nueva ventana. Usa "Compartir" o "Guardar" desde el menú del navegador.
+        📱 <strong>En móvil:</strong> Usa "Exportar TXT" - el contenido se copiará automáticamente. Luego pégalo en Notes, Gmail, o Google Drive.
         <br/>
-        💻 <strong>En computadora:</strong> El archivo se descargará automáticamente a tu carpeta de Descargas.
+        💻 <strong>En computadora:</strong> Ambos formatos se descargarán automáticamente a tu carpeta de Descargas.
     </p>
 </div>
     <button 
