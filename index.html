@@ -549,6 +549,21 @@ const exportToWord = () => {
                                             • <strong>Comunicación:</strong> prefieren lenguaje técnico o simple, formal o casual
                                         </p>
                                     </div>
+        </div>
+                                <div>
+                                    <label className="label">6. Extensión</label>
+                                    <select value={data.length} onChange={(e) => update('length', e.target.value)} className="input-field">
+                                        <option value="">Seleccionar extensión...</option>
+                                        <option value="~100 palabras">Muy corto (~100 palabras)</option>
+                                        <option value="~250 palabras">Corto (~250 palabras)</option>
+                                        <option value="~500 palabras">Medio (~500 palabras)</option>
+                                        <option value="~1000 palabras">Largo (~1000 palabras)</option>
+                                        <option value="~2000 palabras">Muy largo (~2000 palabras)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style={{borderTop: '2px solid #FF7A00', paddingTop: '24px'}}>
                                 </div>
                             <div style={{borderTop: '2px solid #FF7A00', paddingTop: '24px'}}>
                                 <h3 style={{fontSize: '18px', fontWeight: 700, marginBottom: '16px'}}>
