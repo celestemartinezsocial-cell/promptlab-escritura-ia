@@ -531,23 +531,26 @@ const exportToWord = () => {
 
                             <div className="grid-2">
                                 <div>
-                                    <label className="label">5. Audiencia *</label>
-                                    <input type="text" value={data.audience} onChange={(e) => update('audience', e.target.value)}
-                                        placeholder="Ej: Profesionales de 30+ años" className="input-field" />
-                                </div>
-                                <div>
-                                    <label className="label">6. Extensión</label>
-                                    <select value={data.length} onChange={(e) => update('length', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar extensión...</option>
-                                        <option value="~100 palabras">Muy corto (~100 palabras)</option>
-                                        <option value="~250 palabras">Corto (~250 palabras)</option>
-                                        <option value="~500 palabras">Medio (~500 palabras)</option>
-                                        <option value="~1000 palabras">Largo (~1000 palabras)</option>
-                                        <option value="~2000 palabras">Muy largo (~2000 palabras)</option>
-                                    </select>
-                                </div>
-                            </div>
-
+                                   <div>
+    <label className="label">5. Audiencia *</label>
+    <input type="text" value={data.audience} onChange={(e) => update('audience', e.target.value)}
+        placeholder="Ej: Profesionales 35-50 años, gerentes de marketing, con experiencia básica en IA, buscan soluciones prácticas sin tecnicismos"
+        className="input-field" />
+    <div style={{background: '#F0F9FF', padding: '12px', borderRadius: '8px', border: '1px solid #BFDBFE', marginTop: '8px'}}>
+        <p style={{fontSize: '13px', color: '#1E40AF', margin: 0}}>
+            <strong>💡 Mientras más detalles, mejor:</strong>
+        </p>
+        <p style={{fontSize: '12px', color: '#1E3A8A', margin: '8px 0 0 0', lineHeight: '1.6'}}>
+            • <strong>Demográficos:</strong> edad, ubicación, profesión, industria
+            <br/>
+            • <strong>Comportamiento:</strong> nivel de experiencia, hábitos de consumo de contenido
+            <br/>
+            • <strong>Necesidades:</strong> qué buscan, qué problemas tienen, qué valoran
+            <br/>
+            • <strong>Comunicación:</strong> prefieren lenguaje técnico o simple, formal o casual
+        </p>
+    </div>
+</div>
                             <div style={{borderTop: '2px solid #FF7A00', paddingTop: '24px'}}>
                                 <h3 style={{fontSize: '18px', fontWeight: 700, marginBottom: '16px'}}>
                                     📋 Detalles Críticos
