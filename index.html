@@ -140,6 +140,15 @@
                 return newData;
             });
         };
+        // Auto-llenar instrucciones adicionales con el plan de mejora
+React.useEffect(() => {
+    if (step === 2 && ref.change && !data.additionalInstructions) {
+        setData(prev => ({
+            ...prev,
+            additionalInstructions: ref.change
+        }));
+    }
+}, [step]);
 
         const getPromptQuality = () => {
             const requiredFields = ['contentType', 'topic', 'purpose', 'audience', 'tone'];
