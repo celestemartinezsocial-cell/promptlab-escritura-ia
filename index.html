@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PromptLab - Escritura con IA</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Security: Pinned CDN versions to prevent supply-chain attacks -->
+    <!-- TODO: Generate SRI hashes with: curl URL | openssl dgst -sha384 -binary | openssl base64 -A -->
+    <!-- Then add integrity="sha384-HASH" to each script tag -->
+    <script crossorigin="anonymous" src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+    <script crossorigin="anonymous" src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
@@ -351,13 +354,25 @@ const exportToWord = () => {
         // Detectar iOS específicamente
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const isAndroid = /Android/.test(navigator.userAgent);
-        
+
         if (isIOS || isAndroid) {
             // En móvil: mostrar mensaje e invitar a usar TXT
-            alert('📱 En móviles, es más fácil usar "Exportar TXT".\n\nOpciones:\n1. Usa el botón "Exportar TXT" (recomendado)\n2. O exporta desde una computadora para obtener formato Word');
+            alert('En moviles, es mas facil usar "Exportar TXT".\n\nOpciones:\n1. Usa el boton "Exportar TXT" (recomendado)\n2. O exporta desde una computadora para obtener formato Word');
             return;
         }
-        
+
+        // Security: Sanitize content before inserting into HTML to prevent XSS
+        const sanitizeHTML = (str) => {
+            if (!str) return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
+                .replace(/\n/g, '<br>');
+        };
+
         // En escritorio: descarga Word normal
         const content = `
 <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'>
@@ -368,12 +383,12 @@ const exportToWord = () => {
 <body>
     <h1>PromptLab - Proyecto</h1>
     <h2>Prompt Inicial</h2>
-    <p>${buildPrompt().replace(/\n/g, '<br>')}</p>
-    <h2>Primera Versión</h2>
-    <p>${resp1.replace(/\n/g, '<br>')}</p>
-    ${resp2 ? `<h2>Versión Mejorada</h2><p>${resp2.replace(/\n/g, '<br>')}</p>` : ''}
+    <p>${sanitizeHTML(buildPrompt())}</p>
+    <h2>Primera Version</h2>
+    <p>${sanitizeHTML(resp1)}</p>
+    ${resp2 ? `<h2>Version Mejorada</h2><p>${sanitizeHTML(resp2)}</p>` : ''}
     <h2>Aprendizajes</h2>
-    <p>${finalRef.learning || 'Sin aprendizajes registrados'}</p>
+    <p>${sanitizeHTML(finalRef.learning) || 'Sin aprendizajes registrados'}</p>
 </body>
 </html>`;
         
