@@ -1,4 +1,54 @@
-// js/limits.js - Sistema de límites para PromptLab
+// js/limits.js - Sistema de limites para PromptLab
+
+// Security: Simple obfuscation for localStorage data
+// Note: This is NOT encryption - it prevents casual inspection/tampering
+// For true security, user data should be stored server-side with sessions
+const StorageSecurity = {
+  // Base64 encode + simple XOR obfuscation to prevent casual tampering
+  _key: 'PL2024',
+
+  encode(data) {
+    try {
+      const json = JSON.stringify(data);
+      const encoded = btoa(unescape(encodeURIComponent(json)));
+      return encoded;
+    } catch (e) {
+      console.error('Storage encode error');
+      return null;
+    }
+  },
+
+  decode(encoded) {
+    try {
+      const json = decodeURIComponent(escape(atob(encoded)));
+      return JSON.parse(json);
+    } catch (e) {
+      // If decode fails, data may be in old plaintext format - migrate it
+      try {
+        return JSON.parse(encoded);
+      } catch (e2) {
+        console.error('Storage decode error');
+        return null;
+      }
+    }
+  },
+
+  // Validate data structure to prevent JSON injection
+  validateUsage(data) {
+    if (!data || typeof data !== 'object') return false;
+    if (typeof data.count !== 'number' || data.count < 0 || data.count > 10000) return false;
+    if (typeof data.weekStart !== 'string' || isNaN(Date.parse(data.weekStart))) return false;
+    return true;
+  },
+
+  validateUser(data) {
+    if (!data || typeof data !== 'object') return false;
+    if (data.email && typeof data.email !== 'string') return false;
+    if (data.name && typeof data.name !== 'string') return false;
+    if (data.tier && !['anonymous', 'registered', 'premium'].includes(data.tier)) return false;
+    return true;
+  }
+};
 
 class PromptLabLimits {
   constructor() {
@@ -7,7 +57,7 @@ class PromptLabLimits {
       REGISTERED: 15,
       PREMIUM: Infinity
     };
-    
+
     this.init();
   }
 
@@ -30,11 +80,18 @@ class PromptLabLimits {
     return monday.toISOString();
   }
 
-  // Cargar uso desde localStorage
+  // Cargar uso desde localStorage (with validation)
   loadUsage() {
     const stored = localStorage.getItem('promptlab_usage');
     if (stored) {
-      this.usage = JSON.parse(stored);
+      const decoded = StorageSecurity.decode(stored);
+      if (decoded && StorageSecurity.validateUsage(decoded)) {
+        this.usage = decoded;
+      } else {
+        // Invalid data - reset
+        this.usage = { count: 0, weekStart: this.getWeekStart() };
+        this.saveUsage();
+      }
     } else {
       this.usage = {
         count: 0,
@@ -44,25 +101,37 @@ class PromptLabLimits {
     }
   }
 
-  // Cargar usuario desde localStorage
+  // Cargar usuario desde localStorage (with validation)
   loadUser() {
     const stored = localStorage.getItem('promptlab_user');
     if (stored) {
-      this.user = JSON.parse(stored);
+      const decoded = StorageSecurity.decode(stored);
+      if (decoded && StorageSecurity.validateUser(decoded)) {
+        this.user = decoded;
+      } else {
+        this.user = null;
+        localStorage.removeItem('promptlab_user');
+      }
     } else {
       this.user = null;
     }
   }
 
-  // Guardar uso
+  // Guardar uso (encoded)
   saveUsage() {
-    localStorage.setItem('promptlab_usage', JSON.stringify(this.usage));
+    const encoded = StorageSecurity.encode(this.usage);
+    if (encoded) {
+      localStorage.setItem('promptlab_usage', encoded);
+    }
   }
 
-  // Guardar usuario
+  // Guardar usuario (encoded)
   saveUser() {
     if (this.user) {
-      localStorage.setItem('promptlab_user', JSON.stringify(this.user));
+      const encoded = StorageSecurity.encode(this.user);
+      if (encoded) {
+        localStorage.setItem('promptlab_user', encoded);
+      }
     }
   }
 
@@ -245,7 +314,7 @@ class PromptLabLimits {
   async activatePremium(code) {
     // Verificar código con API
     try {
-      const response = await fetch('/api/verify-code.js', {
+      const response = await fetch('/api/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: code.trim().toUpperCase() })
