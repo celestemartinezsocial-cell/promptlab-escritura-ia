@@ -19,8 +19,15 @@ const USAGE_LIMITS = {
 };
 
 async function redisCommand(command, args) {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  // Check all common Upstash env var names (integration may use different names)
+  const url = process.env.UPSTASH_REDIS_REST_URL
+    || process.env.KV_REST_API_URL
+    || process.env.REDIS_REST_URL
+    || process.env.KV_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+    || process.env.KV_REST_API_TOKEN
+    || process.env.REDIS_REST_TOKEN
+    || process.env.KV_REST_API_READ_ONLY_TOKEN;
   if (!url || !token) return null;
 
   try {
