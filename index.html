@@ -262,7 +262,10 @@ INSTRUCCIONES CRÍTICAS:
         
         const res = await fetch("/api/generate", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "X-Tier": window.promptLabLimits ? window.promptLabLimits.getUserTier() : "anonymous"
+            },
             body: JSON.stringify(requestBody)
         });
         
@@ -524,6 +527,7 @@ const exportToWord = () => {
                                 <label className="label">2. ¿Sobre qué estás escribiendo? *</label>
                                 <input type="text" value={data.topic} onChange={(e) => update('topic', e.target.value)}
                                     placeholder="Ej: El impacto del trabajo remoto en equipos de desarrollo"
+                                    maxLength={200}
                                     className="input-field" />
                                 <p className="helper-text">Mientras más específico, mejores resultados</p>
                             </div>
@@ -550,6 +554,7 @@ const exportToWord = () => {
    <label className="label">5. Audiencia *</label>
     <input type="text" value={data.audience} onChange={(e) => update('audience', e.target.value)}
         placeholder="Ej: Profesionales 35-50 años, gerentes de marketing, con experiencia básica en IA, buscan soluciones prácticas sin tecnicismos"
+        maxLength={500}
         className="input-field" />
     <div style={{background: '#F0F9FF', padding: '12px', borderRadius: '8px', border: '1px solid #BFDBFE', marginTop: '8px'}}>
                                         <p style={{fontSize: '13px', color: '#1E40AF', margin: 0}}>
@@ -589,11 +594,12 @@ const exportToWord = () => {
                                 <div className="space-y-4">
                                     <div>
                                         <label className="label">7. Palabras clave (opcional)</label>
-                                        <input 
+                                        <input
                                             type="text"
-                                            value={data.keywords || ''} 
-                                            onChange={(e) => update('keywords', e.target.value)} 
+                                            value={data.keywords || ''}
+                                            onChange={(e) => update('keywords', e.target.value)}
                                             className="input-field"
+                                            maxLength={300}
                                             placeholder="Ej: innovación, sostenibilidad, ROI, transformación digital"
                                         />
                                         <p className="helper-text">Palabras que DEBEN aparecer en el contenido</p>
@@ -601,10 +607,11 @@ const exportToWord = () => {
 
                                     <div>
                                         <label className="label">8. Instrucciones adicionales (opcional)</label>
-                                        <textarea 
-                                            value={data.additionalInstructions || ''} 
-                                            onChange={(e) => update('additionalInstructions', e.target.value)} 
-                                            className="textarea-field" 
+                                        <textarea
+                                            value={data.additionalInstructions || ''}
+                                            onChange={(e) => update('additionalInstructions', e.target.value)}
+                                            className="textarea-field"
+                                            maxLength={1000}
                                             placeholder="Ej: Formato con bullets, estilo como NYTimes, incluir 3 CTAs, usar datos del Q4, evitar jerga técnica..."
                                             rows="2"
                                         />
@@ -668,17 +675,17 @@ const exportToWord = () => {
                                         <div>
                                             <label className="label">✅ ¿Qué funcionó bien?</label>
                                             <textarea value={ref.worked} onChange={(e) => setRef({...ref, worked: e.target.value})}
-                                                placeholder="Ej: El tono fue perfecto..." className="textarea-field"></textarea>
+                                                placeholder="Ej: El tono fue perfecto..." maxLength={500} className="textarea-field"></textarea>
                                         </div>
                                         <div>
                                             <label className="label">❌ ¿Qué no funcionó?</label>
                                             <textarea value={ref.notWorked} onChange={(e) => setRef({...ref, notWorked: e.target.value})}
-                                                placeholder="Ej: Muy formal..." className="textarea-field"></textarea>
+                                                placeholder="Ej: Muy formal..." maxLength={500} className="textarea-field"></textarea>
                                         </div>
                                         <div>
                                             <label className="label">🔧 ¿Qué cambiarás?</label>
                                             <textarea value={ref.change} onChange={(e) => setRef({...ref, change: e.target.value})}
-                                                placeholder="Ej: Agregar ejemplos..." className="textarea-field"></textarea>
+                                                placeholder="Ej: Agregar ejemplos..." maxLength={500} className="textarea-field"></textarea>
                                         </div>
                                     </div>
                                 </>
@@ -752,10 +759,11 @@ const exportToWord = () => {
 
                 <div>
                     <label className="label">Instrucciones adicionales</label>
-                    <textarea 
-                        value={data.additionalInstructions || ''} 
-                        onChange={(e) => update('additionalInstructions', e.target.value)} 
-                        className="textarea-field" 
+                    <textarea
+                        value={data.additionalInstructions || ''}
+                        onChange={(e) => update('additionalInstructions', e.target.value)}
+                        className="textarea-field"
+                        maxLength={1000}
                         placeholder="Ej: Formato con bullets, incluir 3 CTAs, evitar clichés..."
                         rows="3"
                     />

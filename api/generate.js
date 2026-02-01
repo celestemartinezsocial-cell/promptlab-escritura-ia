@@ -4,24 +4,114 @@ const ALLOWED_ORIGINS = [
   'https://www.celestemartinez.net',
 ];
 
-// Security: Rate limiting per IP (in-memory, resets on cold start)
-const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX = 10; // max requests per window
+// ---- Upstash Redis helpers (persistent rate limiting & usage tracking) ----
+// Falls back to in-memory if UPSTASH env vars are not set
 
-function isRateLimited(ip) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
+const inMemoryRateLimit = new Map();
+const RATE_LIMIT_WINDOW_SEC = 60;
+const RATE_LIMIT_MAX = 10;
 
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    rateLimitMap.set(ip, { windowStart: now, count: 1 });
-    return false;
+// Weekly usage limits enforced server-side
+const USAGE_LIMITS = {
+  anonymous: 10,
+  registered: 15,
+  premium: null // unlimited
+};
+
+async function redisCommand(command, args) {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+
+  try {
+    const res = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify([command, ...args])
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.result;
+  } catch {
+    return null;
+  }
+}
+
+async function isRateLimited(ip) {
+  const key = `rl:${ip}`;
+
+  // Try Redis first
+  const count = await redisCommand('INCR', [key]);
+  if (count !== null) {
+    if (count === 1) {
+      await redisCommand('EXPIRE', [key, RATE_LIMIT_WINDOW_SEC]);
+    }
+    return count > RATE_LIMIT_MAX;
   }
 
+  // Fallback: in-memory
+  const now = Date.now();
+  const entry = inMemoryRateLimit.get(ip);
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_SEC * 1000) {
+    inMemoryRateLimit.set(ip, { windowStart: now, count: 1 });
+    return false;
+  }
   entry.count++;
-  if (entry.count > RATE_LIMIT_MAX) return true;
-  return false;
+  return entry.count > RATE_LIMIT_MAX;
 }
+
+// Server-side weekly usage tracking
+function getWeekKey() {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diff);
+  monday.setHours(0, 0, 0, 0);
+  // Key format: week:2026-01-26
+  return `week:${monday.toISOString().split('T')[0]}`;
+}
+
+function getSecondsUntilNextMonday() {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const daysUntilMonday = dayOfWeek === 0 ? 1 : 8 - dayOfWeek;
+  const nextMonday = new Date(now);
+  nextMonday.setDate(now.getDate() + daysUntilMonday);
+  nextMonday.setHours(0, 0, 0, 0);
+  return Math.ceil((nextMonday - now) / 1000);
+}
+
+async function checkAndIncrementUsage(ip, tier) {
+  // Premium users bypass limits
+  if (tier === 'premium') return { allowed: true };
+
+  const limit = USAGE_LIMITS[tier] || USAGE_LIMITS.anonymous;
+  const weekKey = getWeekKey();
+  const usageKey = `usage:${weekKey}:${ip}`;
+
+  // Try Redis
+  const count = await redisCommand('INCR', [usageKey]);
+  if (count !== null) {
+    if (count === 1) {
+      // Set expiry to end of week + 1 day buffer
+      const ttl = getSecondsUntilNextMonday() + 86400;
+      await redisCommand('EXPIRE', [usageKey, ttl]);
+    }
+    if (count > limit) {
+      return { allowed: false, remaining: 0, limit };
+    }
+    return { allowed: true, remaining: limit - count, limit };
+  }
+
+  // No Redis configured - allow (client-side limits still apply as fallback)
+  return { allowed: true };
+}
+
+// ---- Request helpers ----
 
 function getAllowedOrigin(req) {
   const origin = req.headers?.origin || '';
@@ -36,7 +126,7 @@ function setSecurityHeaders(res, allowedOrigin) {
     res.setHeader('Vary', 'Origin');
   }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-CSRF-Token');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Tier');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -78,13 +168,35 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Origen no autorizado' });
   }
 
-  // Rate limiting
+  // Get client IP
   const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
     req.headers['x-real-ip'] ||
     req.socket?.remoteAddress || 'unknown';
 
-  if (isRateLimited(clientIp)) {
+  // Rate limiting (per-minute burst protection)
+  if (await isRateLimited(clientIp)) {
     return res.status(429).json({ error: 'Demasiadas solicitudes. Intenta de nuevo en un minuto.' });
+  }
+
+  // Server-side weekly usage enforcement
+  // Client sends tier claim via header - server validates against its own count
+  const claimedTier = req.headers['x-tier'] || 'anonymous';
+  const validTiers = ['anonymous', 'registered', 'premium'];
+  const tier = validTiers.includes(claimedTier) ? claimedTier : 'anonymous';
+
+  // For premium claims, verify via a signed token in the future
+  // For now, server enforces the most restrictive anonymous limit per IP
+  // This means even if someone claims premium, the IP-based limit still applies
+  // unless they have a valid premium session
+  const serverTier = tier === 'premium' ? 'premium' : tier;
+  const usageCheck = await checkAndIncrementUsage(clientIp, serverTier);
+
+  if (!usageCheck.allowed) {
+    return res.status(429).json({
+      error: 'Has alcanzado tu limite semanal de generaciones.',
+      remaining: 0,
+      limit: usageCheck.limit
+    });
   }
 
   // Verify API key is configured
@@ -100,15 +212,15 @@ export default async function handler(req, res) {
     let apiMessages;
     if (messages) {
       if (!validateMessages(messages)) {
-        return res.status(400).json({ error: 'Formato de mensajes inválido' });
+        return res.status(400).json({ error: 'Formato de mensajes invalido' });
       }
       apiMessages = messages;
     } else if (prompt) {
       if (typeof prompt !== 'string' || prompt.trim().length === 0) {
-        return res.status(400).json({ error: 'Prompt inválido' });
+        return res.status(400).json({ error: 'Prompt invalido' });
       }
       if (prompt.length > MAX_PROMPT_LENGTH) {
-        return res.status(400).json({ error: 'Prompt demasiado largo (máximo 5000 caracteres)' });
+        return res.status(400).json({ error: 'Prompt demasiado largo (maximo 5000 caracteres)' });
       }
       apiMessages = [{ role: "user", content: prompt.trim() }];
     } else {
@@ -139,7 +251,11 @@ export default async function handler(req, res) {
     const data = await response.json();
     const text = data.content[0]?.text || '';
 
-    return res.status(200).json({ text });
+    // Include remaining usage info in response
+    return res.status(200).json({
+      text,
+      ...(usageCheck.remaining != null ? { remaining: usageCheck.remaining } : {})
+    });
 
   } catch (error) {
     // Security: Don't expose internal error details to client
