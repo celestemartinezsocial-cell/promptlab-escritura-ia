@@ -153,6 +153,12 @@ class PromptLabLimits {
     return this.user.tier || 'anonymous';
   }
 
+  // Obtener premium token (server-issued)
+  getPremiumToken() {
+    if (!this.user) return null;
+    return this.user.premiumToken || null;
+  }
+
   // Obtener límite según tier
   getLimit() {
     const tier = this.getUserTier();
@@ -331,6 +337,10 @@ class PromptLabLimits {
             tier: 'premium',
             activatedAt: new Date().toISOString()
           };
+        }
+        // Store server-issued premium token for API validation
+        if (data.premiumToken) {
+          this.user.premiumToken = data.premiumToken;
         }
         this.saveUser();
         this.updateUI();

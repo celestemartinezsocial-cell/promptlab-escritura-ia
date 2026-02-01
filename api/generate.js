@@ -8,6 +8,7 @@ const ALLOWED_ORIGINS = [
 // Falls back to in-memory if UPSTASH env vars are not set
 
 const inMemoryRateLimit = new Map();
+const inMemoryUsage = new Map(); // Fallback usage tracking when Redis is down
 const RATE_LIMIT_WINDOW_SEC = 60;
 const RATE_LIMIT_MAX = 10;
 
@@ -92,11 +93,20 @@ function getSecondsUntilNextMonday() {
   return Math.ceil((nextMonday - now) / 1000);
 }
 
-async function checkAndIncrementUsage(ip, tier) {
-  // Premium users bypass limits
-  if (tier === 'premium') return { allowed: true };
+async function checkAndIncrementUsage(ip, tier, premiumToken) {
+  // Premium users: verify token in Redis before granting unlimited access
+  if (tier === 'premium' && premiumToken) {
+    const tokenKey = `premium:${premiumToken}`;
+    const tokenData = await redisCommand('GET', [tokenKey]);
+    if (tokenData !== null) {
+      // Valid premium token confirmed server-side
+      return { allowed: true };
+    }
+    // Invalid or expired token - fall through to anonymous limits
+  }
 
-  const limit = USAGE_LIMITS[tier] || USAGE_LIMITS.anonymous;
+  // Non-premium or unverified premium: enforce limits
+  const limit = USAGE_LIMITS[tier === 'premium' ? 'anonymous' : tier] || USAGE_LIMITS.anonymous;
   const weekKey = getWeekKey();
   const usageKey = `usage:${weekKey}:${ip}`;
 
@@ -114,8 +124,22 @@ async function checkAndIncrementUsage(ip, tier) {
     return { allowed: true, remaining: limit - count, limit };
   }
 
-  // No Redis configured - allow (client-side limits still apply as fallback)
-  return { allowed: true };
+  // Redis unavailable fallback: use in-memory tracking with strict limits
+  const fallbackKey = `usage:${ip}`;
+  const now = Date.now();
+  const entry = inMemoryUsage.get(fallbackKey);
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+
+  if (!entry || now - entry.start > weekMs) {
+    inMemoryUsage.set(fallbackKey, { start: now, count: 1 });
+    return { allowed: true, remaining: limit - 1, limit };
+  }
+
+  entry.count++;
+  if (entry.count > limit) {
+    return { allowed: false, remaining: 0, limit };
+  }
+  return { allowed: true, remaining: limit - entry.count, limit };
 }
 
 // ---- Request helpers ----
@@ -133,7 +157,7 @@ function setSecurityHeaders(res, allowedOrigin) {
     res.setHeader('Vary', 'Origin');
   }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Tier');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Tier, X-Premium-Token');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -186,17 +210,13 @@ export default async function handler(req, res) {
   }
 
   // Server-side weekly usage enforcement
-  // Client sends tier claim via header - server validates against its own count
   const claimedTier = req.headers['x-tier'] || 'anonymous';
   const validTiers = ['anonymous', 'registered', 'premium'];
   const tier = validTiers.includes(claimedTier) ? claimedTier : 'anonymous';
 
-  // For premium claims, verify via a signed token in the future
-  // For now, server enforces the most restrictive anonymous limit per IP
-  // This means even if someone claims premium, the IP-based limit still applies
-  // unless they have a valid premium session
-  const serverTier = tier === 'premium' ? 'premium' : tier;
-  const usageCheck = await checkAndIncrementUsage(clientIp, serverTier);
+  // Premium claims require a server-issued token for validation
+  const premiumToken = req.headers['x-premium-token'] || null;
+  const usageCheck = await checkAndIncrementUsage(clientIp, tier, premiumToken);
 
   if (!usageCheck.allowed) {
     return res.status(429).json({

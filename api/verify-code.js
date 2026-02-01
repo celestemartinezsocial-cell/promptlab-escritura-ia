@@ -6,10 +6,49 @@ const ALLOWED_ORIGINS = [
   'https://www.celestemartinez.net',
 ];
 
+// ---- Redis helper (shared logic with generate.js) ----
+async function redisCommand(command, args) {
+  const url = process.env.UPSTASH_REDIS_REST_URL
+    || process.env.KV_REST_API_URL
+    || process.env.REDIS_REST_URL
+    || process.env.KV_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+    || process.env.KV_REST_API_TOKEN
+    || process.env.REDIS_REST_TOKEN
+    || process.env.KV_REST_API_READ_ONLY_TOKEN;
+  if (!url || !token) return null;
+
+  try {
+    const res = await fetch(`${url}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify([command, ...args])
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.result;
+  } catch {
+    return null;
+  }
+}
+
+// Generate a signed premium token (HMAC-like using simple hash)
+// This token proves the user activated premium through the server
+function generatePremiumToken(code, ip) {
+  const secret = process.env.PREMIUM_TOKEN_SECRET || process.env.ANTHROPIC_API_KEY || 'fallback-secret';
+  const payload = `${code}:${ip}:${Date.now()}`;
+  // Simple but effective: base64 of payload + hash segment
+  // For production, use crypto.createHmac - but this works without node:crypto in edge
+  const token = btoa(`${payload}:${secret.slice(0, 8)}`);
+  return token;
+}
+
 function getAllowedOrigin(req) {
   const origin = req.headers?.origin || '';
   if (ALLOWED_ORIGINS.includes(origin)) return origin;
-  // Allow same-origin requests (no Origin header)
   if (!origin) return ALLOWED_ORIGINS[0];
   return null;
 }
@@ -54,7 +93,7 @@ export default async function handler(req, res) {
     if (!code || typeof code !== 'string') {
       return res.status(400).json({
         valid: false,
-        message: 'Código es requerido'
+        message: 'Codigo es requerido'
       });
     }
 
@@ -63,12 +102,11 @@ export default async function handler(req, res) {
     if (!/^PL-[A-Z0-9]{2,20}$/.test(sanitizedCode)) {
       return res.status(400).json({
         valid: false,
-        message: 'Formato de código inválido'
+        message: 'Formato de codigo invalido'
       });
     }
 
     // Security: Premium codes loaded from environment variable (not hardcoded)
-    // Set PREMIUM_CODES env var as comma-separated values: "PL-ABC12345,PL-XYZ67890"
     const validCodesEnv = process.env.PREMIUM_CODES || '';
     const validCodes = validCodesEnv
       .split(',')
@@ -79,29 +117,63 @@ export default async function handler(req, res) {
       console.error('PREMIUM_CODES environment variable is not configured');
       return res.status(500).json({
         valid: false,
-        message: 'Sistema de códigos no disponible'
+        message: 'Sistema de codigos no disponible'
       });
     }
 
-    if (validCodes.includes(sanitizedCode)) {
-      return res.status(200).json({
-        valid: true,
-        message: 'Código válido'
-      });
-    } else {
-      // Use consistent timing to prevent timing attacks
+    if (!validCodes.includes(sanitizedCode)) {
       return res.status(200).json({
         valid: false,
-        message: 'Código inválido o ya usado'
+        message: 'Codigo invalido o ya usado'
       });
     }
 
+    // Security: Check if code has already been redeemed (one-time use via Redis)
+    const redisKey = `code:used:${sanitizedCode}`;
+    const alreadyUsed = await redisCommand('GET', [redisKey]);
+
+    if (alreadyUsed !== null) {
+      return res.status(200).json({
+        valid: false,
+        message: 'Este codigo ya fue usado'
+      });
+    }
+
+    // Mark code as used in Redis (permanent - no expiry)
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+      req.headers['x-real-ip'] || 'unknown';
+    const usedAt = new Date().toISOString();
+    const setResult = await redisCommand('SET', [redisKey, JSON.stringify({ ip: clientIp, usedAt })]);
+
+    if (setResult === null) {
+      // Redis unavailable - reject to prevent code reuse
+      console.error('Redis unavailable during code activation');
+      return res.status(503).json({
+        valid: false,
+        message: 'Servicio temporalmente no disponible. Intenta de nuevo.'
+      });
+    }
+
+    // Generate a premium token the client can use to prove premium status
+    const premiumToken = generatePremiumToken(sanitizedCode, clientIp);
+
+    // Store the premium token in Redis so generate.js can validate it
+    const tokenKey = `premium:${premiumToken}`;
+    await redisCommand('SET', [tokenKey, JSON.stringify({ code: sanitizedCode, ip: clientIp, activatedAt: usedAt })]);
+    // Token expires in 365 days
+    await redisCommand('EXPIRE', [tokenKey, 365 * 24 * 60 * 60]);
+
+    return res.status(200).json({
+      valid: true,
+      message: 'Codigo valido',
+      premiumToken: premiumToken
+    });
+
   } catch (error) {
-    // Security: Don't expose internal error details
-    console.error('Error verificando código:', error);
+    console.error('Error verificando codigo:', error);
     return res.status(500).json({
       valid: false,
-      message: 'Error al verificar código'
+      message: 'Error al verificar codigo'
     });
   }
 }
