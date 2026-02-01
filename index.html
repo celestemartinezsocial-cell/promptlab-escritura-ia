@@ -260,12 +260,17 @@ INSTRUCCIONES CRÍTICAS:
             };
         }
         
+        const fetchHeaders = {
+            "Content-Type": "application/json",
+            "X-Tier": window.promptLabLimits ? window.promptLabLimits.getUserTier() : "anonymous"
+        };
+        // Send server-issued premium token if available
+        if (window.promptLabLimits && window.promptLabLimits.getPremiumToken()) {
+            fetchHeaders["X-Premium-Token"] = window.promptLabLimits.getPremiumToken();
+        }
         const res = await fetch("/api/generate", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Tier": window.promptLabLimits ? window.promptLabLimits.getUserTier() : "anonymous"
-            },
+            headers: fetchHeaders,
             body: JSON.stringify(requestBody)
         });
         
