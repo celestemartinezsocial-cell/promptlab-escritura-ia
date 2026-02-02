@@ -59,18 +59,20 @@
     const App = () => {
         const [step, setStep] = useState(0);
         const [data, setData] = useState({
-            contentType: '', 
+            contentType: '',
             docSubtype: '',
             presentationSubtype: '',
             proposalSubtype: '',
             socialSubtype: '',
-            topic: '', 
-            purpose: '', 
-            audience: '', 
-            tone: '', 
+            topic: '',
+            purpose: [],
+            customPurpose: '',
+            audience: '',
+            tone: [],
+            customTone: '',
             length: '',
-            format: '', 
-            examples: '', 
+            format: '',
+            examples: '',
             constraints: '',
             keywords: '',
             additionalInstructions: ''
@@ -124,12 +126,16 @@
 
         const purposes = [
             'Informar/Educar', 'Persuadir/Convencer', 'Inspirar/Motivar',
-            'Anunciar/Actualizar', 'Solicitar/Proponer', 'Documentar/Registrar'
+            'Anunciar/Actualizar', 'Solicitar/Proponer', 'Documentar/Registrar',
+            'Entretener', 'Vender/Promocionar', 'Explicar un proceso',
+            'Otro'
         ];
 
         const tones = [
             'Profesional', 'Casual/Conversacional', 'Formal',
-            'Amigable', 'Autoritario', 'Empático'
+            'Amigable', 'Autoritario', 'Empático',
+            'Humorístico', 'Inspirador', 'Directo/Conciso',
+            'Técnico', 'Cercano', 'Otro'
         ];
 
         const steps = ['Crear', 'Probar & Analizar', 'Mejorar', 'Comparar & Aprender'];
@@ -148,9 +154,20 @@
         };
         // Auto-llenar instrucciones adicionales con el plan de mejora
 
+        const toggleMulti = (field, value) => {
+            setData(prev => {
+                const current = prev[field] || [];
+                const updated = current.includes(value)
+                    ? current.filter(v => v !== value)
+                    : [...current, value];
+                return { ...prev, [field]: updated };
+            });
+        };
+
         const getPromptQuality = () => {
-            const requiredFields = ['contentType', 'topic', 'purpose', 'audience', 'tone'];
-            const filledRequired = requiredFields.filter(f => data[f]).length;
+            const requiredFilled = data.contentType && data.topic && data.audience
+                && data.purpose.length > 0 && data.tone.length > 0;
+            const filledRequired = requiredFilled ? 5 : [data.contentType, data.topic, data.audience, data.purpose.length > 0, data.tone.length > 0].filter(Boolean).length;
             const optionalFields = ['length', 'keywords', 'additionalInstructions'];
             const filledOptional = optionalFields.filter(f => data[f]).length;
             
@@ -200,9 +217,23 @@
             }
             
             const d = [];
-            if (data.purpose) d.push(`Propósito: ${data.purpose}`);
+            const purposeList = [...(data.purpose || [])];
+            if (purposeList.includes('Otro') && data.customPurpose) {
+                purposeList[purposeList.indexOf('Otro')] = data.customPurpose;
+            } else {
+                const otroIdx = purposeList.indexOf('Otro');
+                if (otroIdx > -1 && !data.customPurpose) purposeList.splice(otroIdx, 1);
+            }
+            if (purposeList.length > 0) d.push(`Propósito: ${purposeList.join(', ')}`);
             if (data.audience) d.push(`Audiencia: ${data.audience}`);
-            if (data.tone) d.push(`Tono: ${data.tone}`);
+            const toneList = [...(data.tone || [])];
+            if (toneList.includes('Otro') && data.customTone) {
+                toneList[toneList.indexOf('Otro')] = data.customTone;
+            } else {
+                const otroIdx = toneList.indexOf('Otro');
+                if (otroIdx > -1 && !data.customTone) toneList.splice(otroIdx, 1);
+            }
+            if (toneList.length > 0) d.push(`Tono: ${toneList.join(', ')}`);
             if (data.length) d.push(`Extensión: ${data.length}`);
             if (d.length > 0) p += '\n\n' + d.join('\n');
             
@@ -567,21 +598,40 @@ const exportToWord = () => {
                                 <p className="helper-text">Mientras más específico, mejores resultados</p>
                             </div>
 
-                            <div className="grid-2">
-                                <div>
-                                    <label className="label">3. Propósito *</label>
-                                    <select value={data.purpose} onChange={(e) => update('purpose', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar...</option>
-                                        {purposes.map(p => <option key={p} value={p}>{p}</option>)}
-                                    </select>
+                            <div>
+                                <label className="label">3. Propósito * <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
+                                <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
+                                    {purposes.map(p => (
+                                        <button key={p} onClick={() => toggleMulti('purpose', p)}
+                                            className={`content-btn ${data.purpose.includes(p) ? 'active' : ''}`}
+                                            style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
+                                            {p}
+                                        </button>
+                                    ))}
                                 </div>
-                                <div>
-                                    <label className="label">4. Tono *</label>
-                                    <select value={data.tone} onChange={(e) => update('tone', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar...</option>
-                                        {tones.map(t => <option key={t} value={t}>{t}</option>)}
-                                    </select>
+                                {data.purpose.includes('Otro') && (
+                                    <input type="text" value={data.customPurpose || ''} onChange={(e) => update('customPurpose', e.target.value)}
+                                        placeholder="Escribe tu propósito..." maxLength={100}
+                                        className="input-field" style={{marginTop: '8px'}} />
+                                )}
+                            </div>
+
+                            <div>
+                                <label className="label">4. Tono * <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
+                                <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
+                                    {tones.map(t => (
+                                        <button key={t} onClick={() => toggleMulti('tone', t)}
+                                            className={`content-btn ${data.tone.includes(t) ? 'active' : ''}`}
+                                            style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
+                                            {t}
+                                        </button>
+                                    ))}
                                 </div>
+                                {data.tone.includes('Otro') && (
+                                    <input type="text" value={data.customTone || ''} onChange={(e) => update('customTone', e.target.value)}
+                                        placeholder="Escribe tu tono..." maxLength={100}
+                                        className="input-field" style={{marginTop: '8px'}} />
+                                )}
                             </div>
 
                            <div className="grid-2">
@@ -686,7 +736,7 @@ const exportToWord = () => {
                                 <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
                             </div>
 
-                            <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || !data.purpose || !data.audience || !data.tone || loading} className="btn-primary">
+                            <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || !data.purpose.length || !data.audience || !data.tone.length || loading} className="btn-primary">
                                 {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
                             </button>
 
@@ -746,21 +796,39 @@ const exportToWord = () => {
             </h3>
 
             <div className="space-y-4">
-                <div className="grid-2">
-                    <div>
-                        <label className="label">Propósito</label>
-                        <select value={data.purpose} onChange={(e) => update('purpose', e.target.value)} className="input-field">
-                            <option value="">Seleccionar...</option>
-                            {purposes.map(p => <option key={p} value={p}>{p}</option>)}
-                        </select>
+                <div>
+                    <label className="label">Propósito <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
+                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '6px'}}>
+                        {purposes.map(p => (
+                            <button key={p} onClick={() => toggleMulti('purpose', p)}
+                                className={`content-btn ${data.purpose.includes(p) ? 'active' : ''}`}
+                                style={{padding: '6px 12px', fontSize: '12px', flex: 'none'}}>
+                                {p}
+                            </button>
+                        ))}
                     </div>
-                    <div>
-                        <label className="label">Tono</label>
-                        <select value={data.tone} onChange={(e) => update('tone', e.target.value)} className="input-field">
-                            <option value="">Seleccionar...</option>
-                            {tones.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
+                    {data.purpose.includes('Otro') && (
+                        <input type="text" value={data.customPurpose || ''} onChange={(e) => update('customPurpose', e.target.value)}
+                            placeholder="Escribe tu propósito..." maxLength={100}
+                            className="input-field" style={{marginTop: '8px'}} />
+                    )}
+                </div>
+                <div>
+                    <label className="label">Tono <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
+                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '6px'}}>
+                        {tones.map(t => (
+                            <button key={t} onClick={() => toggleMulti('tone', t)}
+                                className={`content-btn ${data.tone.includes(t) ? 'active' : ''}`}
+                                style={{padding: '6px 12px', fontSize: '12px', flex: 'none'}}>
+                                {t}
+                            </button>
+                        ))}
                     </div>
+                    {data.tone.includes('Otro') && (
+                        <input type="text" value={data.customTone || ''} onChange={(e) => update('customTone', e.target.value)}
+                            placeholder="Escribe tu tono..." maxLength={100}
+                            className="input-field" style={{marginTop: '8px'}} />
+                    )}
                 </div>
 
                 <div className="grid-2">
