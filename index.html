@@ -39,7 +39,10 @@
         .alert-orange { background: #FED7AA; border-color: #F59E0B; color: #000000; }
         .alert-purple { background: #FAF5FF; border-color: #A855F7; color: #6B21A8; }
         .alert-pink { background: #FCE7F3; border-color: #EC4899; color: #831843; }
-        .response-box { background: white; border: 1px solid #E8E9E9; border-radius: 8px; padding: 16px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; font-size: 16px; }
+        .copy-btn { position: relative; background: #FF7A00; color: white; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .copy-btn:hover { opacity: 0.9; }
+        .copy-btn.copied { background: #22C55E; }
+        .response-box { background: white; border: 1px solid #E8E9E9; border-radius: 8px; padding: 16px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; font-size: 16px; position: relative; }
         .step-indicator { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
         .progress-line { flex: 1; height: 4px; margin: 0 8px; }
         .animate-spin { animation: spin 1s linear infinite; }
@@ -296,10 +299,37 @@ INSTRUCCIONES CRÍTICAS:
         setLoading(false);
     }
 };
-        const copy = (text) => {
-            navigator.clipboard.writeText(text);
-            alert('Copiado');
+        const [copyStatus, setCopyStatus] = useState({});
+        const copy = (text, id) => {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    setCopyStatus(prev => ({...prev, [id]: true}));
+                    setTimeout(() => setCopyStatus(prev => ({...prev, [id]: false})), 2000);
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    textarea.style.position = 'fixed';
+                    textarea.style.opacity = '0';
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    setCopyStatus(prev => ({...prev, [id]: true}));
+                    setTimeout(() => setCopyStatus(prev => ({...prev, [id]: false})), 2000);
+                });
+            }
         };
+
+        const CopyButton = ({text, id, large}) => (
+            <button
+                onClick={() => copy(text, id)}
+                className={`copy-btn ${copyStatus[id] ? 'copied' : ''}`}
+                style={large ? {padding: '12px 24px', fontSize: '16px', width: '100%'} : {}}
+            >
+                {copyStatus[id] ? '✓ Copiado' : '📋 Copiar'}
+            </button>
+        );
 
      const exportData = () => {
     try {
@@ -665,11 +695,12 @@ const exportToWord = () => {
                                     <div style={{background: '#EFF6FF', padding: '16px', borderRadius: '8px', border: '1px solid #BFDBFE'}}>
                                         <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
                                             <label className="label">Contenido Generado:</label>
-                                            <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '8px 16px', fontSize: '14px'}}>
-                                                📋 Copiar
-                                            </button>
+                                            <CopyButton text={resp1} id="resp1-step2" />
                                         </div>
                                         <div className="response-box">{resp1}</div>
+                                        <div style={{marginTop: '8px'}}>
+                                            <CopyButton text={resp1} id="resp1-step2-bottom" large />
+                                        </div>
                                     </div>
 
                                     <div className="alert alert-orange">
@@ -807,9 +838,7 @@ const exportToWord = () => {
                         <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
                             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
                                 <label className="label">📄 Primera versión</label>
-                                <button onClick={() => copy(resp1)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
-                                    📋 Copiar
-                                </button>
+                                <CopyButton text={resp1} id="resp1-compare" />
                             </div>
                             <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp1}</div>
                             <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
@@ -821,9 +850,7 @@ const exportToWord = () => {
                         <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
                             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
                                 <label className="label">✨ Versión mejorada</label>
-                                <button onClick={() => copy(resp2)} className="btn-secondary" style={{padding: '6px 12px', fontSize: '12px'}}>
-                                    📋 Copiar
-                                </button>
+                                <CopyButton text={resp2} id="resp2-compare" />
                             </div>
                             <div className="response-box" style={{fontSize: '14px', maxHeight: '300px'}}>{resp2}</div>
                             <div style={{marginTop: '12px', padding: '8px', background: '#E5E7EB', borderRadius: '4px'}}>
@@ -857,11 +884,17 @@ const exportToWord = () => {
                                 <>
                                     <div className="grid-2">
                                         <div style={{background: '#EFF6FF', padding: '16px', borderRadius: '8px'}}>
-                                            <label className="label">Primera:</label>
+                                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
+                                                <label className="label" style={{margin: 0}}>Primera:</label>
+                                                <CopyButton text={resp1} id="resp1-step4" />
+                                            </div>
                                             <div className="response-box" style={{fontSize: '12px', maxHeight: '200px'}}>{resp1}</div>
                                         </div>
                                         <div style={{background: '#F0FDF4', padding: '16px', borderRadius: '8px'}}>
-                                            <label className="label">Mejorada:</label>
+                                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
+                                                <label className="label" style={{margin: 0}}>Mejorada:</label>
+                                                <CopyButton text={resp2} id="resp2-step4" />
+                                            </div>
                                             <div className="response-box" style={{fontSize: '12px', maxHeight: '200px'}}>{resp2}</div>
                                         </div>
                                     </div>
