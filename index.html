@@ -80,7 +80,12 @@
         const [resp1, setResp1] = useState('');
         const [resp2, setResp2] = useState('');
         const [ref, setRef] = useState({ worked: '', notWorked: '', change: '' });
-        const [finalRef, setFinalRef] = useState({ better: '', tone: '', bigChange: '', learning: '' });
+        const [finalRef, setFinalRef] = useState({
+    betterPrompt: '',
+    biggestChange: '',
+    otherChange: '',
+    keyInsight: ''
+});
         const [loading, setLoading] = useState(false);
 
         const types = [
@@ -984,33 +989,107 @@ const exportToWord = () => {
                                         </div>
                                     </div>
 
-                                    <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px', border: '1px solid #9CA3AF'}}>
-                                        <h3 style={{fontWeight: 700, color: '#374151', marginBottom: '16px'}}>📝 Reflexión Final</h3>
-                                        
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label className="label">¿Cuál logra mejor tu propósito?</label>
-                                                <textarea value={finalRef.better} onChange={(e) => setFinalRef({...finalRef, better: e.target.value})}
-                                                    className="textarea-field"></textarea>
-                                            </div>
-                                            <div>
-                                                <label className="label">¿Cuál tiene el tono correcto?</label>
-                                                <textarea value={finalRef.tone} onChange={(e) => setFinalRef({...finalRef, tone: e.target.value})}
-                                                    className="textarea-field"></textarea>
-                                            </div>
-                                            <div>
-                                                <label className="label">¿Qué cambio hizo la mayor mejora?</label>
-                                                <textarea value={finalRef.bigChange} onChange={(e) => setFinalRef({...finalRef, bigChange: e.target.value})}
-                                                    className="textarea-field"></textarea>
-                                            </div>
-                                            <div>
-                                                <label className="label">¿Qué aprendiste?</label>
-                                                <textarea value={finalRef.learning} onChange={(e) => setFinalRef({...finalRef, learning: e.target.value})}
-                                                    className="textarea-field"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
+                                   <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px', border: '1px solid #9CA3AF'}}>
+    <h3 style={{fontWeight: 700, color: '#374151', marginBottom: '16px'}}>📝 Reflexión Final</h3>
+    
+    <div className="space-y-4">
+        {/* Pregunta 1: Radio buttons */}
+        <div>
+            <label className="label" style={{marginBottom: '12px', display: 'block'}}>
+                ✓ El prompt que mejor logró mi propósito fue:
+            </label>
+            <div style={{display: 'flex', gap: '20px', marginLeft: '8px'}}>
+                <label style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
+                    <input
+                        type="radio"
+                        name="betterPrompt"
+                        value="inicial"
+                        checked={finalRef.betterPrompt === 'inicial'}
+                        onChange={(e) => setFinalRef({...finalRef, betterPrompt: e.target.value})}
+                        style={{marginRight: '8px'}}
+                    />
+                    Prompt Inicial
+                </label>
+                <label style={{display: 'flex', alignItems: 'center', cursor: 'pointer'}}>
+                    <input
+                        type="radio"
+                        name="betterPrompt"
+                        value="mejorado"
+                        checked={finalRef.betterPrompt === 'mejorado'}
+                        onChange={(e) => setFinalRef({...finalRef, betterPrompt: e.target.value})}
+                        style={{marginRight: '8px'}}
+                    />
+                    Prompt Mejorado
+                </label>
+            </div>
+        </div>
 
+        {/* Pregunta 2: Radio buttons con opciones */}
+        <div>
+            <label className="label" style={{marginBottom: '12px', display: 'block'}}>
+                ✓ El cambio que hizo la mayor diferencia fue:
+            </label>
+            <div style={{marginLeft: '8px'}}>
+                {[
+                    {value: 'contexto', label: 'Ser más específico con el contexto'},
+                    {value: 'instrucciones', label: 'Mejorar las instrucciones'},
+                    {value: 'tono', label: 'Ajustar el tono'},
+                    {value: 'ejemplos', label: 'Dar ejemplos concretos'}
+                ].map(option => (
+                    <label key={option.value} style={{display: 'block', marginBottom: '8px', cursor: 'pointer'}}>
+                        <input
+                            type="radio"
+                            name="biggestChange"
+                            value={option.value}
+                            checked={finalRef.biggestChange === option.value}
+                            onChange={(e) => setFinalRef({...finalRef, biggestChange: e.target.value})}
+                            style={{marginRight: '8px'}}
+                        />
+                        {option.label}
+                    </label>
+                ))}
+                <label style={{display: 'flex', alignItems: 'center', cursor: 'pointer', marginTop: '8px'}}>
+                    <input
+                        type="radio"
+                        name="biggestChange"
+                        value="otro"
+                        checked={finalRef.biggestChange === 'otro'}
+                        onChange={(e) => setFinalRef({...finalRef, biggestChange: e.target.value})}
+                        style={{marginRight: '8px'}}
+                    />
+                    Otro:
+                    <input
+                        type="text"
+                        value={finalRef.otherChange || ''}
+                        onChange={(e) => setFinalRef({...finalRef, otherChange: e.target.value})}
+                        disabled={finalRef.biggestChange !== 'otro'}
+                        placeholder="Especifica..."
+                        style={{
+                            marginLeft: '8px',
+                            padding: '6px 12px',
+                            border: '1px solid #D1D5DB',
+                            borderRadius: '4px',
+                            flex: 1,
+                            backgroundColor: finalRef.biggestChange !== 'otro' ? '#F9FAFB' : 'white'
+                        }}
+                    />
+                </label>
+            </div>
+        </div>
+
+        {/* Pregunta 3: Textarea corto */}
+        <div>
+            <label className="label">💡 Un insight clave que me llevo:</label>
+            <textarea 
+                value={finalRef.keyInsight || ''} 
+                onChange={(e) => setFinalRef({...finalRef, keyInsight: e.target.value})}
+                className="textarea-field"
+                rows="3"
+                placeholder="Escribe 1-2 líneas sobre lo que aprendiste..."
+            ></textarea>
+        </div>
+    </div>
+</div>
                                     <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px'}}>
     <h3 style={{fontWeight: 700, color: '#000000', marginBottom: '12px'}}>🎉 Puntos Clave</h3>
     <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ Pequeños cambios = grandes mejoras</p>
