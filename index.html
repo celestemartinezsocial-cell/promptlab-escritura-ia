@@ -86,52 +86,67 @@
     otherChange: '',
     keyInsight: ''
 });
-        const copyAllToClipboard = () => {
+  const copyAllToClipboard = () => {
     const content = `
 PROMPTLAB - ESCRITURA CON IA
 =============================
 
-PASO 1: PROPÓSITO Y AUDIENCIA
------------------------------
-Propósito: ${data.purpose.join(', ')}
+PASO 1: CONFIGURACIÓN
+---------------------
+Tipo de contenido: ${data.contentType}
+Tema: ${data.topic}
+Propósito: ${data.purpose.join(', ')}${data.customPurpose ? ` (${data.customPurpose})` : ''}
 Audiencia: ${data.audience}
+Tono: ${data.tone.join(', ')}${data.customTone ? ` (${data.customTone})` : ''}
+${data.length ? `Extensión: ${data.length}` : ''}
+${data.format ? `Formato: ${data.format}` : ''}
+${data.examples ? `Ejemplos: ${data.examples}` : ''}
+${data.constraints ? `Restricciones: ${data.constraints}` : ''}
+${data.keywords ? `Palabras clave: ${data.keywords}` : ''}
+${data.additionalInstructions ? `Instrucciones adicionales: ${data.additionalInstructions}` : ''}
 
 PASO 2: PROMPT INICIAL
-----------------------
-${generatePrompt()}
+-----------------------
+${buildPrompt()}
 
 RESPUESTA DE LA IA:
-${resp1}
+${resp1 || '(No generada aún)'}
 
 PASO 3: ANÁLISIS
-----------------
-¿Qué funcionó?: ${ref.worked}
-¿Qué no funcionó?: ${ref.notWorked}
-¿Qué cambiarías?: ${ref.change}
+-----------------
+✅ ¿Qué funcionó bien?: ${ref.worked || '(Sin completar)'}
+❌ ¿Qué no funcionó?: ${ref.notWorked || '(Sin completar)'}
+🔧 ¿Qué cambiarás?: ${ref.change || '(Sin completar)'}
 
 PASO 4: PROMPT MEJORADO
------------------------
-[Tu prompt mejorado aquí]
+------------------------
+${resp2 ? buildPrompt() : '(No generado aún)'}
 
-RESPUESTA DE LA IA:
-${resp2}
+RESPUESTA DE LA IA MEJORADA:
+${resp2 || '(No generada aún)'}
 
 REFLEXIÓN FINAL
---------------
-✓ Prompt que mejor logró mi propósito: ${finalRef.betterPrompt === 'inicial' ? 'Prompt Inicial' : 'Prompt Mejorado'}
+---------------
+✓ Prompt que mejor logró mi propósito: ${
+    finalRef.betterPrompt === 'inicial' ? 'Prompt Inicial' : 
+    finalRef.betterPrompt === 'mejorado' ? 'Prompt Mejorado' : 
+    '(Sin seleccionar)'
+}
 
 ✓ Cambio que hizo la mayor diferencia: ${
     finalRef.biggestChange === 'otro' ? finalRef.otherChange : 
     finalRef.biggestChange === 'contexto' ? 'Ser más específico con el contexto' :
     finalRef.biggestChange === 'instrucciones' ? 'Mejorar las instrucciones' :
     finalRef.biggestChange === 'tono' ? 'Ajustar el tono' :
-    finalRef.biggestChange === 'ejemplos' ? 'Dar ejemplos concretos' : ''
+    finalRef.biggestChange === 'ejemplos' ? 'Dar ejemplos concretos' :
+    '(Sin seleccionar)'
 }
 
-💡 Insight clave: ${finalRef.keyInsight}
+💡 Insight clave: ${finalRef.keyInsight || '(Sin completar)'}
 
 ---
 Generado con PromptLab - Escritura con IA
+${new Date().toLocaleDateString('es-ES')}
 `;
 
     navigator.clipboard.writeText(content).then(() => {
