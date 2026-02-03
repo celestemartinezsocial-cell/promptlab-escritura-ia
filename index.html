@@ -86,6 +86,61 @@
     otherChange: '',
     keyInsight: ''
 });
+        const copyAllToClipboard = () => {
+    const content = `
+PROMPTLAB - ESCRITURA CON IA
+=============================
+
+PASO 1: PROPÓSITO Y AUDIENCIA
+-----------------------------
+Propósito: ${data.purpose.join(', ')}
+Audiencia: ${data.audience}
+
+PASO 2: PROMPT INICIAL
+----------------------
+${generatePrompt()}
+
+RESPUESTA DE LA IA:
+${resp1}
+
+PASO 3: ANÁLISIS
+----------------
+¿Qué funcionó?: ${ref.worked}
+¿Qué no funcionó?: ${ref.notWorked}
+¿Qué cambiarías?: ${ref.change}
+
+PASO 4: PROMPT MEJORADO
+-----------------------
+[Tu prompt mejorado aquí]
+
+RESPUESTA DE LA IA:
+${resp2}
+
+REFLEXIÓN FINAL
+--------------
+✓ Prompt que mejor logró mi propósito: ${finalRef.betterPrompt === 'inicial' ? 'Prompt Inicial' : 'Prompt Mejorado'}
+
+✓ Cambio que hizo la mayor diferencia: ${
+    finalRef.biggestChange === 'otro' ? finalRef.otherChange : 
+    finalRef.biggestChange === 'contexto' ? 'Ser más específico con el contexto' :
+    finalRef.biggestChange === 'instrucciones' ? 'Mejorar las instrucciones' :
+    finalRef.biggestChange === 'tono' ? 'Ajustar el tono' :
+    finalRef.biggestChange === 'ejemplos' ? 'Dar ejemplos concretos' : ''
+}
+
+💡 Insight clave: ${finalRef.keyInsight}
+
+---
+Generado con PromptLab - Escritura con IA
+`;
+
+    navigator.clipboard.writeText(content).then(() => {
+        alert('✅ Todo el contenido copiado al portapapeles');
+    }).catch(err => {
+        console.error('Error al copiar:', err);
+        alert('❌ No se pudo copiar. Intenta de nuevo.');
+    });
+};
         const [loading, setLoading] = useState(false);
 
         const types = [
@@ -1096,19 +1151,22 @@ const exportToWord = () => {
     <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ La especificidad es clave</p>
     <p style={{fontSize: '14px', color: '#000000', marginBottom: '16px'}}>✓ Los ejemplos son poderosos</p>
     
-    <div style={{display: 'flex', gap: '8px', marginBottom: '12px'}}>
-        <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
-            📄 Exportar TXT
-        </button>
-        <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
-            📘 Exportar Word
-        </button>
-    </div>
-  <div style={{background: '#FFF9F0', padding: '12px', borderRadius: '8px', border: '1px solid #FFE4B5', marginBottom: '12px'}}>
+   <div style={{display: 'flex', gap: '8px', marginBottom: '12px'}}>
+    <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
+        📄 Exportar TXT
+    </button>
+    <button onClick={exportToWord} className="btn-primary" style={{flex: 1}}>
+        📘 Exportar Word
+    </button>
+    <button onClick={copyAllToClipboard} className="btn-primary" style={{flex: 1, background: '#10B981'}}>
+        📋 Copiar Todo
+    </button>
+</div>
+<div style={{background: '#FFF9F0', padding: '12px', borderRadius: '8px', border: '1px solid #FFE4B5', marginBottom: '12px'}}>
     <p style={{fontSize: '12px', color: '#8A8B8C', margin: 0, textAlign: 'center'}}>
-        📱 <strong>En móvil:</strong> Usa "Exportar TXT" - el contenido se copiará automáticamente. Luego pégalo en Notes, Gmail, o Google Drive.
+        📱 <strong>En móvil:</strong> Usa "Exportar TXT" o "Copiar Todo" - el contenido se copiará automáticamente. Luego pégalo en Notes, Gmail, o Google Drive.
         <br/>
-        💻 <strong>En computadora:</strong> Ambos formatos se descargarán automáticamente a tu carpeta de Descargas.
+        💻 <strong>En computadora:</strong> Todos los formatos funcionan. "Copiar Todo" copia al portapapeles para pegar donde quieras.
     </p>
 </div>
     <button 
