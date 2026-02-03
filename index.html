@@ -163,8 +163,9 @@ ${new Date().toLocaleDateString('es-ES')}
             { id: 'report', label: 'Informe', emoji: '📊' },
             { id: 'presentation', label: 'Presentación', emoji: '📽️', hasSubtypes: true },
             { id: 'proposal', label: 'Propuesta', emoji: '💼', hasSubtypes: true },
-            { id: 'documentation', label: 'Documentación', emoji: '📝', hasSubtypes: true },
+            { id: 'documentation', label: 'Documento', emoji: '📝', hasSubtypes: true },
             { id: 'article', label: 'Artículo/Blog', emoji: '✍️' },
+            { id: 'article', label: 'Ensayo', emoji: '✍️' },
             { id: 'social', label: 'Redes Sociales', emoji: '📱', hasSubtypes: true }
         ];
 
@@ -878,7 +879,7 @@ const exportToWord = () => {
         </div>
 
         <div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
-            <label className="label">📋 Tu Plan de Mejora:</label>
+            <label className="label">📋 Tu Plan para Mejorar:</label>
             <p style={{fontSize: '14px', marginBottom: '12px', fontStyle: 'italic'}}>"{ref.change || 'No hay cambios aún'}"</p>
         </div>
 
