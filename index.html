@@ -249,7 +249,16 @@
 
         const generate = async (isRevised) => {
     setLoading(true);
-    
+
+    // Block non-premium users
+    const tier = window.promptLabLimits ? window.promptLabLimits.getUserTier() : 'anonymous';
+    if (tier !== 'premium') {
+        const errorMsg = '🔒 Necesitas un código premium para usar esta herramienta. Adquiérelo en Thinkific.';
+        isRevised ? setResp2(errorMsg) : setResp1(errorMsg);
+        setLoading(false);
+        return;
+    }
+
     try {
         let requestBody;
         
