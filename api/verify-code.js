@@ -124,37 +124,14 @@ export default async function handler(req, res) {
     if (!validCodes.includes(sanitizedCode)) {
       return res.status(200).json({
         valid: false,
-        message: 'Codigo invalido o ya usado'
-      });
-    }
-
-    // Security: Check if code has already been redeemed (one-time use via Redis)
-    const redisKey = `code:used:${sanitizedCode}`;
-    const alreadyUsed = await redisCommand('GET', [redisKey]);
-
-    if (alreadyUsed !== null) {
-      return res.status(200).json({
-        valid: false,
-        message: 'Este codigo ya fue usado'
-      });
-    }
-
-    // Mark code as used in Redis (permanent - no expiry)
-    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-      req.headers['x-real-ip'] || 'unknown';
-    const usedAt = new Date().toISOString();
-    const setResult = await redisCommand('SET', [redisKey, JSON.stringify({ ip: clientIp, usedAt })]);
-
-    if (setResult === null) {
-      // Redis unavailable - reject to prevent code reuse
-      console.error('Redis unavailable during code activation');
-      return res.status(503).json({
-        valid: false,
-        message: 'Servicio temporalmente no disponible. Intenta de nuevo.'
+        message: 'Codigo invalido'
       });
     }
 
     // Generate a premium token the client can use to prove premium status
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+      req.headers['x-real-ip'] || 'unknown';
+    const usedAt = new Date().toISOString();
     const premiumToken = generatePremiumToken(sanitizedCode, clientIp);
 
     // Store the premium token in Redis so generate.js can validate it
