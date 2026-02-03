@@ -60,9 +60,9 @@
         const [step, setStep] = useState(0);
         const [data, setData] = useState({
             contentType: '',
-            docSubtype: '',
-            presentationSubtype: '',
-            proposalSubtype: '',
+            docSubtype: [],
+            presentationSubtype: [],
+            proposalSubtype: [],
             socialSubtype: '',
             topic: '',
             purpose: [],
@@ -144,9 +144,9 @@
             setData(prev => {
                 const newData = { ...prev, [k]: v };
                 if (k === 'contentType') {
-                    newData.docSubtype = '';
-                    newData.presentationSubtype = '';
-                    newData.proposalSubtype = '';
+                    newData.docSubtype = [];
+                    newData.presentationSubtype = [];
+                    newData.proposalSubtype = [];
                     newData.socialSubtype = '';
                 }
                 return newData;
@@ -176,7 +176,7 @@
                                  data.contentType === 'proposal' || 
                                  data.contentType === 'social';
             
-            const hasSubtype = data.docSubtype || data.presentationSubtype || data.proposalSubtype || data.socialSubtype;
+            const hasSubtype = data.docSubtype.length > 0 || data.presentationSubtype.length > 0 || data.proposalSubtype.length > 0 || data.socialSubtype;
             
             if (filledRequired === 5 && (!needsSubtype || hasSubtype) && filledOptional >= 2) {
                 return { emoji: '🟢', text: 'Excelente', color: '#22C55E' };
@@ -194,12 +194,12 @@
             if (data.contentType) {
                 const t = types.find(x => x.id === data.contentType);
                 
-                if (data.contentType === 'documentation' && data.docSubtype) {
-                    typeLabel = data.docSubtype;
-                } else if (data.contentType === 'presentation' && data.presentationSubtype) {
-                    typeLabel = data.presentationSubtype;
-                } else if (data.contentType === 'proposal' && data.proposalSubtype) {
-                    typeLabel = data.proposalSubtype;
+                if (data.contentType === 'documentation' && data.docSubtype.length > 0) {
+                    typeLabel = data.docSubtype.join(', ');
+                } else if (data.contentType === 'presentation' && data.presentationSubtype.length > 0) {
+                    typeLabel = data.presentationSubtype.join(', ');
+                } else if (data.contentType === 'proposal' && data.proposalSubtype.length > 0) {
+                    typeLabel = data.proposalSubtype.join(', ');
                 } else if (data.contentType === 'social' && data.socialSubtype) {
                     typeLabel = `publicación para ${data.socialSubtype}`;
                 } else {
@@ -242,7 +242,7 @@
             if (data.constraints) p += `\n\nRequisitos: ${data.constraints}`;
             if (data.keywords) p += `\n\nPalabras clave a incluir obligatoriamente: ${data.keywords}`;
             if (data.additionalInstructions) p += `\n\nInstrucciones adicionales: ${data.additionalInstructions}`;
-            p += `\n\n[ESTILO CRÍTICO]: Sé directo y auténtico. NO uses frases cliché como "en el mundo de hoy", "es fundamental", "cabe destacar". NO uses lenguaje corporativo vacío. Escribe como un humano real, no como un robot. Prioriza claridad sobre elegancia.`;
+            p += `\n\n[ESTILO CRÍTICO]: Sé directo y auténtico. NO uses frases cliché como "en el mundo de hoy", "es fundamental", "cabe destacar". NO uses lenguaje corporativo vacío. Escribe como un humano real, no como un robot. Prioriza claridad sobre elegancia.\n\n[PRECISIÓN]: Basa tu contenido ÚNICAMENTE en la información proporcionada en este prompt. NO inventes datos, estadísticas, cifras, nombres de estudios o hechos que no se hayan mencionado explícitamente. Si necesitas dar ejemplos, señálalos claramente como hipotéticos. Prefiere decir "según los datos disponibles" en lugar de inventar fuentes. NUNCA hagas suposiciones sobre datos específicos del usuario.`;
             
             return p.trim();
         };
@@ -268,22 +268,24 @@
                         role: "assistant", 
                         content: resp1 
                     },
-                    { 
-                        role: "user", 
-                        content: `Ahora necesito que mejores el contenido anterior aplicando estos cambios específicos:
+                    {
+                        role: "user",
+                        content: `Necesito una versión NOTABLEMENTE DIFERENTE y MEJORADA del contenido anterior.
 
-📝 Plan de mejora: ${improvementPlan}
+📝 Plan de mejora del usuario: ${improvementPlan}
 
-🎯 Nuevo prompt con ajustes:
+🎯 Prompt actualizado:
 ${currentPrompt}
 
-INSTRUCCIONES CRÍTICAS:
-1. MANTÉN las ideas principales y estructura que funcionaron bien del contenido anterior
-2. APLICA específicamente los cambios solicitados (tono, extensión, palabras clave, formato, etc.)
-3. Si cambió el tono, ajusta SOLO el tono manteniendo el contenido
-4. Si cambió la extensión, ajusta la longitud sin perder información clave
-5. Si hay nuevas instrucciones adicionales, aplícalas sobre el contenido existente
-6. Haz mejoras incrementales y precisas sobre el texto anterior, NO generes contenido completamente nuevo desde cero`
+INSTRUCCIONES PARA LA VERSIÓN MEJORADA:
+1. REESCRIBE el contenido desde una perspectiva fresca - NO copies frases ni párrafos del texto anterior
+2. APLICA los cambios solicitados de forma visible y sustancial
+3. USA una estructura diferente: si antes usaste párrafos, prueba con listas; si usaste introducción larga, ve directo al punto
+4. CAMBIA las frases de apertura y cierre completamente - deben ser distintas a la versión anterior
+5. MANTÉN el mismo tema y propósito, pero exprésalo de forma diferente
+6. Si el usuario pidió cambio de tono, el cambio debe ser evidente en cada párrafo
+7. NO repitas las mismas oraciones con sinónimos - genera ideas y enfoques nuevos
+8. Basa el contenido SOLO en información proporcionada - NO inventes datos ni estadísticas`
                     }
                 ]
             };
@@ -544,31 +546,46 @@ const exportToWord = () => {
 
                             {data.contentType === 'documentation' && (
                                 <div>
-                                    <label className="label">Tipo de Documento *</label>
-                                    <select value={data.docSubtype} onChange={(e) => update('docSubtype', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar tipo de documento...</option>
-                                        {docSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
-                                    </select>
+                                    <label className="label">Tipo de Documento * <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
+                                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
+                                        {docSubtypes.map(st => (
+                                            <button key={st} onClick={() => toggleMulti('docSubtype', st)}
+                                                className={`content-btn ${data.docSubtype.includes(st) ? 'active' : ''}`}
+                                                style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
+                                                {st}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
                             {data.contentType === 'presentation' && (
                                 <div>
-                                    <label className="label">Tipo de Presentación *</label>
-                                    <select value={data.presentationSubtype} onChange={(e) => update('presentationSubtype', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar tipo de presentación...</option>
-                                        {presentationSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
-                                    </select>
+                                    <label className="label">Tipo de Presentación * <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
+                                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
+                                        {presentationSubtypes.map(st => (
+                                            <button key={st} onClick={() => toggleMulti('presentationSubtype', st)}
+                                                className={`content-btn ${data.presentationSubtype.includes(st) ? 'active' : ''}`}
+                                                style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
+                                                {st}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
                             {data.contentType === 'proposal' && (
                                 <div>
-                                    <label className="label">Tipo de Propuesta *</label>
-                                    <select value={data.proposalSubtype} onChange={(e) => update('proposalSubtype', e.target.value)} className="input-field">
-                                        <option value="">Seleccionar tipo de propuesta...</option>
-                                        {proposalSubtypes.map(st => <option key={st} value={st}>{st}</option>)}
-                                    </select>
+                                    <label className="label">Tipo de Propuesta * <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
+                                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
+                                        {proposalSubtypes.map(st => (
+                                            <button key={st} onClick={() => toggleMulti('proposalSubtype', st)}
+                                                className={`content-btn ${data.proposalSubtype.includes(st) ? 'active' : ''}`}
+                                                style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
+                                                {st}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
@@ -1020,18 +1037,20 @@ const exportToWord = () => {
             if (window.confirm('¿Estás seguro? Esto borrará todo tu progreso actual y volverás al inicio.')) {
                 setStep(0);
                 setData({
-                    contentType: '', 
-                    docSubtype: '',
-                    presentationSubtype: '',
-                    proposalSubtype: '',
+                    contentType: '',
+                    docSubtype: [],
+                    presentationSubtype: [],
+                    proposalSubtype: [],
                     socialSubtype: '',
-                    topic: '', 
-                    purpose: '', 
-                    audience: '', 
-                    tone: '', 
+                    topic: '',
+                    purpose: [],
+                    customPurpose: '',
+                    audience: '',
+                    tone: [],
+                    customTone: '',
                     length: '',
-                    format: '', 
-                    examples: '', 
+                    format: '',
+                    examples: '',
                     constraints: '',
                     keywords: '',
                     additionalInstructions: ''
