@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PromptLab Escritura con IA</title>
-    <title>PromptLab - Escritura con IA</title>
     <meta name="description" content="Herramienta educativa para aprender a escribir mejores prompts de IA. Crea, prueba y mejora tus prompts paso a paso.">
 <meta name="keywords" content="prompt engineering, escritura con IA, prompts, inteligencia artificial, herramienta educativa">
     <meta name="google-site-verification" content="jXilcW0oFNZU2A9nywZ5AEey96xEW3dlBCsALlwqAsA" />
@@ -720,14 +719,16 @@ const exportToWord = () => {
 
                             <div>
                                 <label className="label">3. Propósito * <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
-                                <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
-                                    {purposes.map(p => (
-                                        <button key={p} onClick={() => toggleMulti('purpose', p)}
-                                            className={`content-btn ${data.purpose.includes(p) ? 'active' : ''}`}
-                                            style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
-                                            {p}
-                                        </button>
-                                    ))}
+                                <div style={{background: '#F9FAFB', padding: '12px', borderRadius: '8px'}}>
+                                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
+                                        {purposes.map(p => (
+                                            <button key={p} onClick={() => toggleMulti('purpose', p)}
+                                                className={`content-btn ${data.purpose.includes(p) ? 'active' : ''}`}
+                                                style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
+                                                {p}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                                 {data.purpose.includes('Otro') && (
                                     <input type="text" value={data.customPurpose || ''} onChange={(e) => update('customPurpose', e.target.value)}
@@ -738,14 +739,16 @@ const exportToWord = () => {
 
                             <div>
                                 <label className="label">4. Tono * <span style={{fontSize: '12px', fontWeight: 400, color: '#8A8B8C'}}>(puedes elegir varios)</span></label>
-                                <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
-                                    {tones.map(t => (
-                                        <button key={t} onClick={() => toggleMulti('tone', t)}
-                                            className={`content-btn ${data.tone.includes(t) ? 'active' : ''}`}
-                                            style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
-                                            {t}
-                                        </button>
-                                    ))}
+                                <div style={{background: '#F9FAFB', padding: '12px', borderRadius: '8px'}}>
+                                    <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
+                                        {tones.map(t => (
+                                            <button key={t} onClick={() => toggleMulti('tone', t)}
+                                                className={`content-btn ${data.tone.includes(t) ? 'active' : ''}`}
+                                                style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
+                                                {t}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                                 {data.tone.includes('Otro') && (
                                     <input type="text" value={data.customTone || ''} onChange={(e) => update('customTone', e.target.value)}
@@ -777,7 +780,7 @@ const exportToWord = () => {
                                     </div>
         </div>
                                 <div>
-                                    <label className="label">6. Extensión</label>
+                                    <label className="label" style={{color: '#8A8B8C'}}>6. Extensión <span style={{fontSize: '12px', fontWeight: 400}}>(opcional)</span></label>
                                     <select value={data.length} onChange={(e) => update('length', e.target.value)} className="input-field">
                                         <option value="">Seleccionar extensión...</option>
                                         <option value="~100 palabras">Muy corto (~100 palabras)</option>
@@ -790,39 +793,47 @@ const exportToWord = () => {
                             </div>
                             
                             <div style={{borderTop: '2px solid #FF7A00', paddingTop: '24px'}}>
-                                </div>
-                            <div style={{borderTop: '2px solid #FF7A00', paddingTop: '24px'}}>
-                                <h3 style={{fontSize: '18px', fontWeight: 700, marginBottom: '16px'}}>
-                                    📋 Detalles Críticos
-                                </h3>
-                                
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="label">7. Palabras clave (opcional)</label>
-                                        <input
-                                            type="text"
-                                            value={data.keywords || ''}
-                                            onChange={(e) => update('keywords', e.target.value)}
-                                            className="input-field"
-                                            maxLength={300}
-                                            placeholder="Ej: innovación, sostenibilidad, ROI, transformación digital"
-                                        />
-                                        <p className="helper-text">Palabras que DEBEN aparecer en el contenido</p>
-                                    </div>
+                                <button
+                                    onClick={() => setData(prev => ({...prev, _showDetails: !prev._showDetails}))}
+                                    style={{background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', padding: 0, width: '100%'}}
+                                >
+                                    <h3 style={{fontSize: '18px', fontWeight: 700, margin: 0}}>
+                                        📋 Detalles Opcionales
+                                    </h3>
+                                    <span style={{fontSize: '14px', color: '#8A8B8C'}}>
+                                        {data._showDetails ? '▲ Ocultar' : '▼ Mostrar más opciones'}
+                                    </span>
+                                </button>
 
-                                    <div>
-                                        <label className="label">8. Instrucciones adicionales (opcional)</label>
-                                        <textarea
-                                            value={data.additionalInstructions || ''}
-                                            onChange={(e) => update('additionalInstructions', e.target.value)}
-                                            className="textarea-field"
-                                            maxLength={1000}
-                                            placeholder="Ej: Formato con bullets, estilo como NYTimes, incluir 3 CTAs, usar datos del Q4, evitar jerga técnica..."
-                                            rows="2"
-                                        />
-                                        <p className="helper-text">Detalles específicos únicos de esta tarea</p>
+                                {data._showDetails && (
+                                    <div className="space-y-4" style={{marginTop: '16px'}}>
+                                        <div>
+                                            <label className="label" style={{color: '#8A8B8C'}}>7. Palabras clave <span style={{fontSize: '12px', fontWeight: 400}}>(opcional)</span></label>
+                                            <input
+                                                type="text"
+                                                value={data.keywords || ''}
+                                                onChange={(e) => update('keywords', e.target.value)}
+                                                className="input-field"
+                                                maxLength={300}
+                                                placeholder="Ej: innovación, sostenibilidad, ROI, transformación digital"
+                                            />
+                                            <p className="helper-text">Palabras que DEBEN aparecer en el contenido</p>
+                                        </div>
+
+                                        <div>
+                                            <label className="label" style={{color: '#8A8B8C'}}>8. Instrucciones adicionales <span style={{fontSize: '12px', fontWeight: 400}}>(opcional)</span></label>
+                                            <textarea
+                                                value={data.additionalInstructions || ''}
+                                                onChange={(e) => update('additionalInstructions', e.target.value)}
+                                                className="textarea-field"
+                                                maxLength={1000}
+                                                placeholder="Ej: Formato con bullets, estilo como NYTimes, incluir 3 CTAs, usar datos del Q4, evitar jerga técnica..."
+                                                rows="2"
+                                            />
+                                            <p className="helper-text">Detalles específicos únicos de esta tarea</p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
                             <div style={{background: '#F9FAFB', border: '1px solid #E8E9E9', borderRadius: '8px', padding: '16px'}}>
