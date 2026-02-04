@@ -506,10 +506,10 @@ const exportToWord = () => {
                 </div>
 
                 <div className="card">
-                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                    <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between'}}>
                         {steps.map((label, i) => (
                             <React.Fragment key={i}>
-                                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1}}>
+                                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '70px'}}>
                                     <div className="step-indicator" style={{
                                         backgroundColor: i === step ? '#FF7A00' : i < step ? '#FFA347' : '#E8E9E9',
                                         color: i <= step ? 'white' : '#9CA3AF'
@@ -525,7 +525,8 @@ const exportToWord = () => {
                                     </div>
                                 </div>
                                 {i < 3 && <div className="progress-line" style={{
-                                    backgroundColor: i < step ? '#FFA347' : '#E8E9E9'
+                                    backgroundColor: i < step ? '#FFA347' : '#E8E9E9',
+                                    marginTop: '18px'
                                 }} />}
                             </React.Fragment>
                         ))}
