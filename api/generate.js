@@ -16,7 +16,7 @@ const RATE_LIMIT_MAX = 10;
 const USAGE_LIMITS = {
   anonymous: 10,
   registered: 15,
-  premium: null // unlimited
+  premium: 50
 };
 
 async function redisCommand(command, args) {
