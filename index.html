@@ -43,11 +43,11 @@
         .copy-btn:hover { opacity: 0.9; }
         .copy-btn.copied { background: #22C55E; }
         .response-box { background: white; border: 1px solid #E8E9E9; border-radius: 8px; padding: 16px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; font-size: 16px; position: relative; }
-        .step-indicator { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .step-indicator { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
         .progress-line { flex: 1; height: 4px; margin: 0 8px; }
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } .step-indicator { width: 32px; height: 32px; min-width: 32px; font-size: 12px; } .progress-line { margin: 0 4px; } }
     </style>
 </head>
 <body>
@@ -517,8 +517,8 @@ const exportToWord = () => {
                                         {i + 1}
                                     </div>
                                     <div style={{
-                                        fontSize: '12px', marginTop: '4px', textAlign: 'center',
-                                        fontWeight: i === step ? 600 : 400,
+                                        fontSize: '11px', marginTop: '4px', textAlign: 'center',
+                                        fontWeight: i === step ? 600 : 400, lineHeight: '1.2',
                                         color: i === step ? '#FF7A00' : '#8A8B8C'
                                     }}>
                                         {label}
