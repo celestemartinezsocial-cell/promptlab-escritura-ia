@@ -231,6 +231,29 @@ ${new Date().toLocaleDateString('es-ES')}
         ];
 
         const steps = ['Crear', 'Probar & Analizar', 'Mejorar', 'Comparar & Aprender'];
+        const quickStartTemplates = [
+    {
+        label: 'Email de ventas',
+        emoji: '📧',
+        data: { contentType: 'email', purpose: ['Vender/Promocionar'], tone: ['Profesional'] }
+    },
+    {
+        label: 'Post de LinkedIn',
+        emoji: '💼',
+        data: { contentType: 'social', socialSubtype: 'LinkedIn', purpose: ['Informar/Educar'], tone: ['Profesional'] }
+    },
+    {
+        label: 'Propuesta comercial',
+        emoji: '📋',
+        data: { contentType: 'proposal', proposalSubtype: ['Comercial'], purpose: ['Persuadir/Convencer'], tone: ['Formal'] }
+    },
+    {
+        label: 'Artículo de blog',
+        emoji: '✍️',
+        data: { contentType: 'article', purpose: ['Informar/Educar'], tone: ['Casual/Conversacional'] }
+    }
+];
+
 
         const update = (k, v) => {
             setData(prev => {
@@ -632,6 +655,21 @@ const exportToWord = () => {
                                 <strong>🎯 Paso 1: Crea tu Prompt</strong><br/><br/>
                                 Un buen prompt es específico y claro. Completa estos campos para que la IA entienda exactamente qué necesitas. Mientras más detalles des, mejores serán los resultados.
                             </div>
+<div style={{background: '#FFF7ED', padding: '16px', borderRadius: '8px', border: '1px solid #FED7AA'}}>
+    <p style={{fontSize: '14px', fontWeight: 600, marginBottom: '12px', color: '#92400E'}}>
+        ¿No sabes por dónde empezar? Elige una plantilla:
+    </p>
+    <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
+        {quickStartTemplates.map(t => (
+            <button key={t.label}
+                onClick={() => setData(prev => ({...prev, ...t.data}))}
+                className="content-btn"
+                style={{padding: '8px 14px', fontSize: '13px', flex: 'none'}}>
+                {t.emoji} {t.label}
+            </button>
+        ))}
+    </div>
+</div>
 
                             <div>
                                 <label className="label">1. Tipo de Contenido *</label>
