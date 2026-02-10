@@ -217,8 +217,8 @@ export default async function handler(req, res) {
   // Premium claims require a server-issued token for validation
   const premiumToken = req.headers['x-premium-token'] || null;
 
-// Bypass temporal para demo
-if (false) {
+// Only premium users with valid tokens can generate
+if (tier !== 'premium' || !premiumToken) {
     return res.status(403).json({ error: 'Se requiere acceso premium. Adquiere tu código en Thinkific.' });
 }
 
