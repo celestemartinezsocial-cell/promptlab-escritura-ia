@@ -67,6 +67,62 @@
   <h1>PromptLab - Escritura con IA</h1>
   <p>Herramienta educativa para aprender a crear mejores prompts de IA. Crea, prueba, mejora y compara tus prompts paso a paso para obtener mejores resultados.</p>
 </noscript>
+    <!-- Modal de Activación Premium -->
+<div class="modal fade" id="activate-modal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 12px;">
+      <div class="modal-header" style="border: none; padding: 24px 24px 0;">
+        <h5 class="modal-title" style="font-weight: 700; color: #FF7A00;">🎯 Activa tu Acceso Premium</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding: 24px;">
+        <div id="activate-form-content">
+          <p style="margin-bottom: 20px; color: #4A4A4A;">
+            Ingresa el código que recibiste al comprar el curso en Thinkific:
+          </p>
+          
+          <form id="activate-form" onsubmit="handleActivatePremium(event)">
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: #374151;">
+                Código Premium:
+              </label>
+              <input 
+                type="text" 
+                id="premium-code" 
+                class="input-field"
+                placeholder="PL-XXXXXXXXXX"
+                required
+                style="text-transform: uppercase;"
+              />
+            </div>
+
+            <div id="activate-error" class="alert" style="background: #FEE2E2; border-left: 4px solid #EF4444; color: #991B1B; display: none; margin-bottom: 16px;">
+            </div>
+
+            <button type="submit" id="activate-submit" class="btn-primary">
+              Activar Premium
+            </button>
+          </form>
+        </div>
+
+        <div id="activate-success" style="display: none; text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+          <h5 style="color: #22C55E; margin-bottom: 8px;">¡Premium Activado!</h5>
+          <p style="color: #8A8B8C;">Recargando página...</p>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #E8E9E9; text-align: center;">
+          <p style="color: #8A8B8C; font-size: 14px; margin-bottom: 8px;">
+            ¿Aún no tienes un código?
+          </p>
+          <a href="https://tu-thinkific.com/premium" target="_blank" class="btn-secondary" style="display: inline-block; text-decoration: none;">
+            Comprar Acceso Premium
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
     
     <script type="text/babel">
@@ -1344,5 +1400,8 @@ const exportToWord = () => {
 
     ReactDOM.render(<App />, document.getElementById('root'));
     </script>
+    <!-- Limits and Modals System -->
+<script src="js/limits.js"></script>
+<script src="js/modals.js"></script>
 </body>
 </html>
