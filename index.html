@@ -364,10 +364,14 @@ ${new Date().toLocaleDateString('es-ES')}
 
 const generate = async (isRevised) => {
     setLoading(true);
-    // Bypass temporal para demo - comentado el bloqueo premium
+    // Block non-premium users
     const tier = window.promptLabLimits ? window.promptLabLimits.getUserTier() : 'anonymous';
-    
-
+    if (tier !== 'premium') {
+        const errorMsg = '🔒 Necesitas un código premium para usar esta herramienta. Adquiérelo en Thinkific.';
+        isRevised ? setResp2(errorMsg) : setResp1(errorMsg);
+        setLoading(false);
+        return;
+    }
     try {
         let requestBody;
         
