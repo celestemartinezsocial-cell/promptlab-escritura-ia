@@ -910,10 +910,8 @@ const exportToWord = () => {
                             {resp1 && (
                                 <>
                                     <div style={{background: '#EFF6FF', padding: '16px', borderRadius: '8px', border: '1px solid #BFDBFE'}}>
-                                        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '12px'}}>
-                                            <label className="label">Contenido Generado:</label>
-                                            <CopyButton text={resp1} id="resp1-step2" />
-                                        </div>
+                                       <label className="label" style={{marginBottom: '12px'}}>Contenido Generado:</label>
+    
                                         <div className="response-box">{resp1}</div>
                                         <div style={{marginTop: '8px'}}>
                                             <CopyButton text={resp1} id="resp1-step2-bottom" large />
@@ -1117,23 +1115,23 @@ const exportToWord = () => {
 
                             {resp2 && (
                                 <>
-                                    <div className="grid-2">
-                                        <div style={{background: '#EFF6FF', padding: '16px', borderRadius: '8px'}}>
-                                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
-                                                <label className="label" style={{margin: 0}}>Primera:</label>
-                                                <CopyButton text={resp1} id="resp1-step4" />
-                                            </div>
-                                            <div className="response-box" style={{fontSize: '12px', maxHeight: '200px'}}>{resp1}</div>
-                                        </div>
-                                        <div style={{background: '#F0FDF4', padding: '16px', borderRadius: '8px'}}>
-                                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
-                                                <label className="label" style={{margin: 0}}>Mejorada:</label>
-                                                <CopyButton text={resp2} id="resp2-step4" />
-                                            </div>
-                                            <div className="response-box" style={{fontSize: '12px', maxHeight: '200px'}}>{resp2}</div>
-                                        </div>
-                                    </div>
-
+                                   <div className="grid-2">
+    <div style={{background: '#EFF6FF', padding: '16px', borderRadius: '8px'}}>
+        <label className="label" style={{marginBottom: '12px'}}>Primera:</label>
+        <div className="response-box">{resp1}</div>
+        <div style={{marginTop: '8px'}}>
+            <CopyButton text={resp1} id="resp1-step4-bottom" large />
+        </div>
+    </div>
+    
+    <div style={{background: '#F0FDF4', padding: '16px', borderRadius: '8px'}}>
+        <label className="label" style={{marginBottom: '12px'}}>Mejorada:</label>
+        <div className="response-box">{resp2}</div>
+        <div style={{marginTop: '8px'}}>
+            <CopyButton text={resp2} id="resp2-step4-bottom" large />
+        </div>
+    </div>
+</div>
                                    <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px', border: '1px solid #9CA3AF'}}>
     <h3 style={{fontWeight: 700, color: '#374151', marginBottom: '16px'}}>📝 Reflexión Final</h3>
     
