@@ -516,10 +516,12 @@ INSTRUCCIONES PARA LA VERSIÓN MEJORADA:
         
         isRevised ? setResp2(text) : setResp1(text);
         
+   
     } catch (e) {
         console.error('Error:', e);
         const errorMsg = `❌ Error: ${e.message}`;
         isRevised ? setResp2(errorMsg) : setResp1(errorMsg);
+  
     } finally {
         setLoading(false);
     }
