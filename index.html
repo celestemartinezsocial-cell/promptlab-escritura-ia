@@ -27,6 +27,9 @@
     
    <!-- reCAPTCHA v3 -->
     <script src="https://www.google.com/recaptcha/api.js?render=6LdcKmgsAAAAAEEBeUlkq5FLYB_o9HNuEyrxNRMh"></script>
+    <!-- Intro.js para walkthrough -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
@@ -64,10 +67,40 @@
         .progress-line { flex: 1; height: 4px; margin: 0 8px; }
         .animate-spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } .step-indicator { width: 32px; height: 32px; min-width: 32px; font-size: 12px; } .progress-line { margin: 0 4px; } }
+  @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } .step-indicator { width: 32px; height: 32px; min-width: 32px; font-size: 12px; } .progress-line { margin: 0 4px; } }
+        
+        /* Intro.js customization */
+        .introjs-tooltip {
+            font-family: 'Montserrat', sans-serif;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .introjs-button {
+            background: #FF7A00;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            text-shadow: none;
+        }
+
+        .introjs-button:hover {
+            background: #E56D00;
+        }
+
+        .introjs-skipbutton {
+            color: #8A8B8C;
+        }
+
+        .introjs-progressbar {
+            background-color: #FF7A00;
+        }
     </style>
 </head>
 <body>
+
     <div id="root"></div>
     <noscript>
   <h1>PromptLab - Escritura con IA</h1>
@@ -164,6 +197,17 @@
     otherChange: '',
     keyInsight: ''
 });
+        React.useEffect(() => {
+    const hasSeenTutorial = localStorage.getItem('promptlab_tutorial_seen');
+    const tier = window.promptLabLimits ? window.promptLabLimits.getUserTier() : 'anonymous';
+    
+    if (!hasSeenTutorial && tier !== 'premium') {
+        setTimeout(() => {
+            startTutorial();
+            localStorage.setItem('promptlab_tutorial_seen', 'true');
+        }, 1000);
+    }
+}, []);
   const copyAllToClipboard = () => {
     const content = `
 PROMPTLAB - ESCRITURA CON IA
@@ -516,7 +560,26 @@ INSTRUCCIONES PARA LA VERSIÓN MEJORADA:
         setLoading(false);
     }
 };
-     
+     } finally {
+        setLoading(false);
+    }
+};  // ← Aquí termina generate
+
+const startTutorial = () => {
+    introJs().setOptions({
+        nextLabel: 'Siguiente →',
+        prevLabel: '← Anterior',
+        doneLabel: '¡Entendido!',
+        skipLabel: 'Saltar',
+        showProgress: true,
+        showBullets: false,
+        exitOnOverlayClick: false,
+        scrollToElement: true,
+        tooltipClass: 'customTooltip'
+    }).start();
+};
+
+
         const [copyStatus, setCopyStatus] = useState({});
         const copy = (text, id) => {
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -665,7 +728,7 @@ const exportToWord = () => {
         return (
             <div className="container">
     <div className="card">
-        <div className="logo-container">
+        <div className="logo-container" data-intro="¡Bienvenido a PromptLab! Aprende a crear prompts efectivos en 4 pasos." data-step="1">
             <img
                 src="https://i.imgur.com/KOEutOB.jpeg"
                 alt="Logo"
@@ -680,17 +743,25 @@ const exportToWord = () => {
         </div>
     </div>
     
-    <div style={{textAlign: 'center', marginBottom: '16px'}}>
-        <button 
-            onClick={() => openActivateModal()} 
-            className="btn-secondary"
-            style={{display: 'inline-block', padding: '12px 32px'}}
-        >
-            🔑 Activar Código Premium
-        </button>
-    </div>
-
-                <div className="card">
+    <div style={{textAlign: 'center', marginBottom: '16px', display: 'flex', gap: '12px', justifyContent: 'center'}}>
+    <button 
+        onClick={() => openActivateModal()} 
+        className="btn-secondary"
+        style={{display: 'inline-block', padding: '12px 32px'}}
+        data-intro="¿Necesitas más generaciones? Activa tu código premium aquí." 
+        data-step="6"
+    >
+        🔑 Activar Código Premium
+    </button>
+    <button 
+        onClick={() => startTutorial()} 
+        className="btn-secondary"
+        style={{display: 'inline-block', padding: '12px 32px'}}
+    >
+        📚 Tutorial
+    </button>
+</div>
+                <div className="card" data-intro="Estos son los 4 pasos del proceso. Iremos paso a paso." data-step="2">
                     <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between'}}>
                         {steps.map((label, i) => (
                             <React.Fragment key={i}>
@@ -720,7 +791,7 @@ const exportToWord = () => {
 
                 <div className="card">
                     {step === 0 && (
-                        <div className="space-y-6">
+                        <div className="space-y-6" data-intro="Aquí defines QUÉ quieres crear y PARA QUIÉN." data-step="3">
                             <div className="alert alert-blue">
                                 <strong>🎯 Paso 1: Crea tu Prompt</strong><br/><br/>
                                 Un buen prompt es específico y claro. Completa estos campos para que la IA entienda exactamente qué necesitas. Mientras más detalles des, mejores serán los resultados.
@@ -975,9 +1046,9 @@ const exportToWord = () => {
                                 <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
                             </div>
 
-                            <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || !data.purpose.length || !data.audience || !data.tone.length || loading} className="btn-primary">
-                                {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
-                            </button>
+                           <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || !data.purpose.length || !data.audience || !data.tone.length || loading} className="btn-primary" data-intro="Genera contenido con IA basado en tu prompt." data-step="4">
+    {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
+</button>
 
                             {resp1 && (
                                 <>
@@ -994,7 +1065,7 @@ const exportToWord = () => {
                                         <strong>🔍 Analiza los resultados:</strong>
                                     </div>
 
-                                    <div className="space-y-4">
+                                   <div className="space-y-4" data-intro="Analiza qué funcionó y qué mejorar." data-step="5">
                                         <div>
                                             <label className="label">✅ ¿Qué funcionó bien?</label>
                                             <textarea value={ref.worked} onChange={(e) => setRef({...ref, worked: e.target.value})}
