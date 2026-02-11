@@ -203,6 +203,29 @@ export default async function handler(req, res) {
   const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
     req.headers['x-real-ip'] ||
     req.socket?.remoteAddress || 'unknown';
+  // Verify reCAPTCHA v3 token
+const recaptchaToken = req.headers['x-recaptcha-token'];
+if (!recaptchaToken) {
+  return res.status(400).json({ error: 'Token de verificación requerido' });
+}
+
+try {
+  const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`
+  });
+  
+  const recaptchaData = await recaptchaResponse.json();
+  
+  if (!recaptchaData.success || recaptchaData.score < 0.5) {
+    console.log('reCAPTCHA failed:', recaptchaData);
+    return res.status(403).json({ error: 'Verificación de seguridad fallida' });
+  }
+} catch (error) {
+  console.error('reCAPTCHA verification error:', error);
+  return res.status(500).json({ error: 'Error en verificación de seguridad' });
+}
 
   // Rate limiting (per-minute burst protection)
   if (await isRateLimited(clientIp)) {
