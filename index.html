@@ -426,7 +426,6 @@ ${new Date().toLocaleDateString('es-ES')}
 
 const generate = async (isRevised) => {
     setLoading(true);
-    // Block non-premium users
     const tier = window.promptLabLimits ? window.promptLabLimits.getUserTier() : 'anonymous';
   
     try {
@@ -441,7 +440,7 @@ const generate = async (isRevised) => {
                 messages: [
                     { 
                         role: "user", 
-                        content: buildPrompt() // El prompt original que generó resp1
+                        content: buildPrompt()
                     },
                     { 
                         role: "assistant", 
@@ -450,12 +449,9 @@ const generate = async (isRevised) => {
                     {
                         role: "user",
                         content: `Necesito una versión NOTABLEMENTE DIFERENTE y MEJORADA del contenido anterior.
-
 📝 Plan de mejora del usuario: ${improvementPlan}
-
 🎯 Prompt actualizado:
 ${currentPrompt}
-
 INSTRUCCIONES PARA LA VERSIÓN MEJORADA:
 1. REESCRIBE el contenido desde una perspectiva fresca - NO copies frases ni párrafos del texto anterior
 2. APLICA los cambios solicitados de forma visible y sustancial
@@ -469,20 +465,9 @@ INSTRUCCIONES PARA LA VERSIÓN MEJORADA:
                 ]
             };
         } else {
-            // Primera generación sin memoria
             requestBody = {
                 prompt: buildPrompt()
             };
-        }
-        
-        const fetchHeaders = {
-            "Content-Type": "application/json",
-            "X-Tier": window.promptLabLimits ? window.promptLabLimits.getUserTier() : "anonymous"
-        };
-        // Send server-issued premium token if available
-        if (window.promptLabLimits && window.promptLabLimits.getPremiumToken()) {
-            fetchHeaders["X-Premium-Token"] = window.promptLabLimits.getPremiumToken();
-        }
         }
         
         // Obtener token de reCAPTCHA v3
@@ -493,8 +478,15 @@ INSTRUCCIONES PARA LA VERSIÓN MEJORADA:
             });
         });
         
-        // Agregar token a headers
-        fetchHeaders['X-Recaptcha-Token'] = recaptchaToken;
+        const fetchHeaders = {
+            "Content-Type": "application/json",
+            "X-Tier": tier,
+            "X-Recaptcha-Token": recaptchaToken
+        };
+        
+        if (window.promptLabLimits && window.promptLabLimits.getPremiumToken()) {
+            fetchHeaders["X-Premium-Token"] = window.promptLabLimits.getPremiumToken();
+        }
         
         const res = await fetch("/api/generate", {
             method: "POST",
@@ -516,12 +508,10 @@ INSTRUCCIONES PARA LA VERSIÓN MEJORADA:
         
         isRevised ? setResp2(text) : setResp1(text);
         
-   
     } catch (e) {
         console.error('Error:', e);
         const errorMsg = `❌ Error: ${e.message}`;
         isRevised ? setResp2(errorMsg) : setResp1(errorMsg);
-  
     } finally {
         setLoading(false);
     }
