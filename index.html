@@ -746,7 +746,7 @@ const exportToWord = () => {
         className="btn-secondary"
         style={{display: 'inline-block', padding: '12px 32px'}}
         data-intro="¿Necesitas más generaciones? Activa tu código premium aquí." 
-        data-step="6"
+        data-step="10"
     >
         🔑 Activar Código Premium
     </button>
@@ -1063,12 +1063,11 @@ const exportToWord = () => {
                                     </div>
 
                                    <div className="space-y-4" data-intro="Analiza qué funcionó y qué mejorar." data-step="5">
-                                        <div>
-                                            <label className="label">✅ ¿Qué funcionó bien?</label>
-                                            <textarea value={ref.worked} onChange={(e) => setRef({...ref, worked: e.target.value})}
-                                                placeholder="Ej: El tono fue perfecto..." maxLength={500} className="textarea-field"></textarea>
-                                        </div>
-                                        <div>
+    <div>
+        <label className="label">✅ ¿Qué funcionó bien?</label>
+        <textarea value={ref.worked} onChange={(e) => setRef({...ref, worked: e.target.value})}
+            placeholder="Ej: El tono fue perfecto..." maxLength={500} className="textarea-field"></textarea>
+    </div>
                                             <label className="label">❌ ¿Qué no funcionó?</label>
                                             <textarea value={ref.notWorked} onChange={(e) => setRef({...ref, notWorked: e.target.value})}
                                                 placeholder="Ej: Muy formal..." maxLength={500} className="textarea-field"></textarea>
@@ -1197,7 +1196,7 @@ const exportToWord = () => {
             </div>
         </div>
 
-        <button onClick={() => generate(true)} disabled={loading} className="btn-primary">
+        <button onClick={() => generate(true)} disabled={loading} className="btn-primary" data-intro="Genera la versión mejorada con tus ajustes." data-step="6">
             {loading ? '⟳ Generando...' : '✨ Generar Versión Mejorada'}
         </button>
 
@@ -1207,7 +1206,7 @@ const exportToWord = () => {
                     <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '16px'}}>
                         <h3 style={{fontSize: '18px', fontWeight: 600}}>Compara tus resultados</h3>
                     </div>
-                    <div className="grid-2">
+                    <div className="grid-2" data-intro="Compara ambas versiones lado a lado para ver la mejora." data-step="7">
                         <div style={{background: '#F3F4F6', padding: '16px', borderRadius: '8px', border: '2px solid #9CA3AF'}}>
                             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
                                 <label className="label">📄 Primera versión</label>
@@ -1272,10 +1271,10 @@ const exportToWord = () => {
         </div>
     </div>
 </div>
-                                   <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px', border: '1px solid #9CA3AF'}}>
+                                   <div style={{background: '#F3F4F6', padding: '24px', borderRadius: '8px', border: '1px solid #9CA3AF'}} data-intro="Reflexiona sobre lo aprendido." data-step="8">
     <h3 style={{fontWeight: 700, color: '#374151', marginBottom: '16px'}}>📝 Reflexión Final</h3>
     
-    <div className="space-y-4">
+    <div className="space-y-4"> 
         {/* Pregunta 1: Radio buttons */}
         <div>
             <label className="label" style={{marginBottom: '12px', display: 'block'}}>
@@ -1379,7 +1378,7 @@ const exportToWord = () => {
     <p style={{fontSize: '14px', color: '#000000', marginBottom: '4px'}}>✓ La especificidad es clave</p>
     <p style={{fontSize: '14px', color: '#000000', marginBottom: '16px'}}>✓ Los ejemplos son poderosos</p>
     
-   <div style={{display: 'flex', gap: '8px', marginBottom: '12px'}}>
+   <div style={{display: 'flex', gap: '8px', marginBottom: '12px'}} data-intro="Exporta tu trabajo para guardarlo o compartirlo." data-step="9">
     <button onClick={exportData} className="btn-primary" style={{flex: 1}}>
         📄 Exportar TXT
     </button>
