@@ -279,9 +279,35 @@ if (tier !== 'premium' || !premiumToken) {
         return res.status(400).json({ error: 'Prompt demasiado largo (maximo 5000 caracteres)' });
       }
       apiMessages = [{ role: "user", content: prompt.trim() }];
-    } else {
-      return res.status(400).json({ error: 'Se requiere prompt o messages' });
+} else {
+    return res.status(400).json({ error: 'Se requiere prompt o messages' });
+}
+
+// Security: Prompt injection detection
+function detectPromptInjection(text) {
+    const dangerousPatterns = [
+        /ignore\s+(all\s+)?(previous|prior|above)\s+instructions?/gi,
+        /forget\s+(everything|all|previous)/gi,
+        /you\s+are\s+now\s+(in\s+)?(admin|root|system)\s+mode/gi,
+        /\[?(system|admin|root)\]?\s*:/gi,
+        /show\s+(me\s+)?(your|the)\s+prompt/gi,
+        /reveal\s+your\s+instructions/gi,
+        /bypass\s+security/gi,
+        /jailbreak/gi,
+        /DAN\s+mode/gi
+    ];
+    
+    return dangerousPatterns.some(pattern => pattern.test(text));
+}
+
+for (const msg of apiMessages) {
+    if (detectPromptInjection(msg.content)) {
+        console.warn('Prompt injection attempt from IP:', clientIp);
+        return res.status(400).json({ 
+            error: 'Contenido sospechoso detectado.' 
+        });
     }
+}
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
