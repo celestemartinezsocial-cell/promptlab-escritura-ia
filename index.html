@@ -1073,10 +1073,9 @@ const exportToWord = () => {
                                                 placeholder="Ej: Muy formal..." maxLength={500} className="textarea-field"></textarea>
                                         </div>
                                         <div>
-                                            <label className="label">🔧 ¿Qué cambiarás?</label>
-                                            <textarea value={ref.change} onChange={(e) => setRef({...ref, change: e.target.value})}
-                                                placeholder="Ej: Agregar ejemplos..." maxLength={500} className="textarea-field"></textarea>
-                                        </div>
+                                           <label className="label">🔧 ¿Qué cambiarás?</label>
+                                        <textarea value={ref.change} onChange={(e) => setRef({...ref, change: e.target.value})}
+                                            placeholder="Ej: Agregar ejemplos..." maxLength={500} className="textarea-field"></textarea>
                                     </div>
                                 </>
                             )}
