@@ -725,8 +725,9 @@ const exportToWord = () => {
         return (
             <div className="container">
     <div className="card">
-        <div className="logo-container" data-intro="¡Bienvenido a PromptLab! Aprende a crear prompts efectivos en 4 pasos." data-step="1">
-            <img
+        <div className="logo-container" data-intro="¡Bienvenido a PromptLab! Aprenderás a escribir prompts que generen mejores resultados de IA en 4 pasos simples." data-step="1">
+        <img
+           
                 src="https://i.imgur.com/KOEutOB.jpeg"
                 alt="Logo"
                 style={{height: '138px', width: 'auto'}}
@@ -745,7 +746,7 @@ const exportToWord = () => {
         onClick={() => openActivateModal()} 
         className="btn-secondary"
         style={{display: 'inline-block', padding: '12px 32px'}}
-        data-intro="¿Necesitas más generaciones? Activa tu código premium aquí." 
+        data-intro="Necesitas un código premium para usar PromptLab. Cada código te da acceso ilimitado para practicar y mejorar tus prompts. Consíguelo en Thinkific."
         data-step="10"
     >
         🔑 Activar Código Premium
@@ -758,7 +759,7 @@ const exportToWord = () => {
         📚 Tutorial
     </button>
 </div>
-                <div className="card" data-intro="Estos son los 4 pasos del proceso. Iremos paso a paso." data-step="2">
+                data-intro="El proceso: 1) Configura tu contenido 2) Genera y analiza 3) Mejora tu prompt 4) Compara resultados. Cada ciclo mejora tus habilidades." data-step="2">
                     <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between'}}>
                         {steps.map((label, i) => (
                             <React.Fragment key={i}>
@@ -788,7 +789,7 @@ const exportToWord = () => {
 
                 <div className="card">
                     {step === 0 && (
-                        <div className="space-y-6" data-intro="Aquí defines QUÉ quieres crear y PARA QUIÉN." data-step="3">
+                        <div className="space-y-6" data-intro="Empieza aquí: Define QUÉ quieres crear y PARA QUIÉN. Cuanto más específico seas, mejores resultados obtendrás. Después generarás contenido, lo analizarás, y crearás una versión mejorada." data-step="3">
                             <div className="alert alert-blue">
                                 <strong>🎯 Paso 1: Crea tu Prompt</strong><br/><br/>
                                 Un buen prompt es específico y claro. Completa estos campos para que la IA entienda exactamente qué necesitas. Mientras más detalles des, mejores serán los resultados.
