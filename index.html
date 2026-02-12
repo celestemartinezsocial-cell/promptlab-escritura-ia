@@ -1043,7 +1043,7 @@ const exportToWord = () => {
                                 <div className="response-box" style={{maxHeight: '150px'}}>{buildPrompt()}</div>
                             </div>
 
-                           <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || !data.purpose.length || !data.audience || !data.tone.length || loading} className="btn-primary" data-intro="Genera contenido con IA basado en tu prompt." data-step="4">
+                           <button onClick={() => generate(false)} disabled={!data.contentType || !data.topic || !data.purpose.length || !data.audience || !data.tone.length || loading} className="btn-primary" data-intro="Genera contenido con IA basado en tu prompt." data-step="5">
     {loading ? '⟳ Generando...' : '✨ Generar Contenido'}
 </button>
 
