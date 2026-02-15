@@ -282,6 +282,13 @@ if (tier !== 'premium' || !premiumToken) {
 } else {
     return res.status(400).json({ error: 'Se requiere prompt o messages' });
 }
+// Validate premium access
+if (tier !== 'premium' || !premiumToken) {
+    return res.status(403).json({ 
+        error: 'Acceso premium requerido. Consigue tu código en: https://www.celestemartinez.net/courses/promptlab' 
+    });
+}
+
 
 // Security: Prompt injection detection
 function detectPromptInjection(text) {
