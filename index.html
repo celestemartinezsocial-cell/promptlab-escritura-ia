@@ -200,6 +200,15 @@
         React.useEffect(() => {
     const hasSeenTutorial = localStorage.getItem('promptlab_tutorial_seen');
     const tier = window.promptLabLimits ? window.promptLabLimits.getUserTier() : 'anonymous';
+            // Block non-premium users
+if (tier !== 'premium') {
+    const errorMsg = '🔒 Necesitas un código premium para usar esta herramienta. Consíguelo en Thinkific: https://www.celestemartinez.net/courses/promptlab';
+    isRevised ? setResp2(errorMsg) : setResp1(errorMsg);
+    setLoading(false);
+    return;
+}
+
+try {
     
     if (!hasSeenTutorial && tier !== 'premium') {
         setTimeout(() => {
